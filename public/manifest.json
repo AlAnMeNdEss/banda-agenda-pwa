@@ -1,0 +1,18 @@
+{
+  "name": "Ministério de Louvor",
+  "short_name": "MinLouvor",
+  "description": "App de gerenciamento de ministério de louvor com agenda de eventos e banco de músicas",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1e293b",
+  "theme_color": "#1e40af",
+  "orientation": "portrait-primary",
+  "categories": ["productivity", "lifestyle"],
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ]
+}

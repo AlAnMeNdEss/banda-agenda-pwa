@@ -14,7 +14,87 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      events: {
+        Row: {
+          created_at: string
+          description: string | null
+          event_date: string
+          event_time: string
+          event_type: string
+          id: string
+          location: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          event_date: string
+          event_time: string
+          event_type: string
+          id?: string
+          location?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          event_date?: string
+          event_time?: string
+          event_type?: string
+          id?: string
+          location?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      songs: {
+        Row: {
+          artist: string
+          bpm: number | null
+          category: string
+          chords: string | null
+          created_at: string
+          id: string
+          is_favorite: boolean | null
+          last_played: string | null
+          lyrics: string | null
+          musical_key: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          artist: string
+          bpm?: number | null
+          category: string
+          chords?: string | null
+          created_at?: string
+          id?: string
+          is_favorite?: boolean | null
+          last_played?: string | null
+          lyrics?: string | null
+          musical_key?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          artist?: string
+          bpm?: number | null
+          category?: string
+          chords?: string | null
+          created_at?: string
+          id?: string
+          is_favorite?: boolean | null
+          last_played?: string | null
+          lyrics?: string | null
+          musical_key?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

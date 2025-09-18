@@ -4,53 +4,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { useEvents, Event } from "@/hooks/useEvents";
 
 const Agenda = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const { data: events = [], isLoading } = useEvents();
 
-  // Mock data - será substituído pelo Supabase
-  const events = [
-    {
-      id: 1,
-      title: "Culto Dominical",
-      date: "2024-01-21",
-      time: "18:30",
-      type: "evento",
-      description: "Culto dominical noturno",
-      location: "Santuário Principal"
-    },
-    {
-      id: 2,
-      title: "Ensaio Geral",
-      date: "2024-01-20",
-      time: "19:00",
-      type: "ensaio",
-      description: "Ensaio para o culto dominical",
-      location: "Sala de Ensaio"
-    },
-    {
-      id: 3,
-      title: "Culto de Oração",
-      date: "2024-01-23",
-      time: "19:30",
-      type: "evento",
-      description: "Culto de oração e jejum",
-      location: "Santuário Principal"
-    },
-    {
-      id: 4,
-      title: "Ensaio - Novas Músicas",
-      date: "2024-01-24",
-      time: "20:00",
-      type: "ensaio",
-      description: "Ensaio das novas músicas do mês",
-      location: "Sala de Ensaio"
-    }
-  ];
-
-  const filteredEvents = events.filter(event =>
+  const filteredEvents = events.filter((event: Event) =>
     event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    event.description.toLowerCase().includes(searchTerm.toLowerCase())
+    (event.description && event.description.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const formatDate = (dateString: string) => {
@@ -61,6 +23,17 @@ const Agenda = () => {
       year: 'numeric'
     });
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-worship flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Carregando eventos...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-worship">
@@ -98,10 +71,10 @@ const Agenda = () => {
                   <div className="flex-shrink-0">
                     <div className="bg-gradient-celestial text-primary-foreground rounded-lg p-4 text-center min-w-[120px]">
                       <div className="text-sm font-medium opacity-90">
-                        {formatDate(event.date).split(' ')[1]} {formatDate(event.date).split(' ')[2]}
+                        {formatDate(event.event_date).split(' ')[1]} {formatDate(event.event_date).split(' ')[2]}
                       </div>
                       <div className="text-2xl font-bold">
-                        {formatDate(event.date).split(' ')[0]}
+                        {formatDate(event.event_date).split(' ')[0]}
                       </div>
                     </div>
                   </div>
@@ -111,26 +84,26 @@ const Agenda = () => {
                     <div className="flex items-start gap-3">
                       <h3 className="text-xl font-semibold text-primary flex-1">{event.title}</h3>
                       <Badge 
-                        variant={event.type === 'evento' ? 'default' : 'secondary'}
-                        className={event.type === 'evento' 
+                        variant={event.event_type === 'evento' ? 'default' : 'secondary'}
+                        className={event.event_type === 'evento' 
                           ? 'bg-gradient-divine text-accent-foreground' 
                           : 'bg-muted text-muted-foreground'
                         }
                       >
-                        {event.type === 'evento' ? 'Evento' : 'Ensaio'}
+                        {event.event_type === 'evento' ? 'Evento' : 'Ensaio'}
                       </Badge>
                     </div>
                     
-                    <p className="text-muted-foreground">{event.description}</p>
+                    <p className="text-muted-foreground">{event.description || 'Sem descrição'}</p>
                     
                     <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                       <div className="flex items-center gap-1">
                         <Clock className="h-4 w-4" />
-                        {event.time}
+                        {event.event_time}
                       </div>
                       <div className="flex items-center gap-1">
                         <Calendar className="h-4 w-4" />
-                        {event.location}
+                        {event.location || 'Local não informado'}
                       </div>
                     </div>
                   </div>

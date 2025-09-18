@@ -5,64 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useSongs, Song } from "@/hooks/useSongs";
 
 const Musicas = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("todas");
-
-  // Mock data - será substituído pelo Supabase
-  const songs = [
-    {
-      id: 1,
-      title: "Como Zaqueu",
-      artist: "Bruna Karla",
-      key: "G",
-      bpm: 72,
-      category: "adoracao",
-      isFavorite: true,
-      lastPlayed: "2024-01-14"
-    },
-    {
-      id: 2,
-      title: "Reckless Love",
-      artist: "Cory Asbury",
-      key: "C",
-      bpm: 68,
-      category: "adoracao",
-      isFavorite: false,
-      lastPlayed: "2024-01-07"
-    },
-    {
-      id: 3,
-      title: "Teu É o Reino",
-      artist: "Davi Sacer",
-      key: "D",
-      bpm: 85,
-      category: "louvor",
-      isFavorite: true,
-      lastPlayed: "2024-01-21"
-    },
-    {
-      id: 4,
-      title: "Oceans",
-      artist: "Hillsong United",
-      key: "Bm",
-      bpm: 60,
-      category: "adoracao",
-      isFavorite: false,
-      lastPlayed: "2024-01-10"
-    },
-    {
-      id: 5,
-      title: "Aleluia",
-      artist: "Gabriela Rocha",
-      key: "F",
-      bpm: 90,
-      category: "louvor",
-      isFavorite: true,
-      lastPlayed: "2024-01-18"
-    }
-  ];
+  const { data: songs = [], isLoading } = useSongs();
 
   const categories = [
     { value: "todas", label: "Todas" },
@@ -70,7 +18,7 @@ const Musicas = () => {
     { value: "adoracao", label: "Adoração" }
   ];
 
-  const filteredSongs = songs.filter(song => {
+  const filteredSongs = songs.filter((song: Song) => {
     const matchesSearch = song.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          song.artist.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = categoryFilter === "todas" || song.category === categoryFilter;
@@ -82,6 +30,17 @@ const Musicas = () => {
       ? 'bg-gradient-celestial text-primary-foreground' 
       : 'bg-gradient-divine text-accent-foreground';
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-worship flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Carregando músicas...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-worship">
@@ -132,27 +91,27 @@ const Musicas = () => {
               <div className="text-sm text-muted-foreground">Total</div>
             </CardContent>
           </Card>
-          <Card className="shadow-gentle">
-            <CardContent className="p-4 text-center">
-              <Heart className="h-8 w-8 text-accent mx-auto mb-2" />
-              <div className="text-2xl font-bold text-primary">{songs.filter(s => s.isFavorite).length}</div>
-              <div className="text-sm text-muted-foreground">Favoritas</div>
-            </CardContent>
-          </Card>
-          <Card className="shadow-gentle">
-            <CardContent className="p-4 text-center">
-              <div className="h-8 w-8 bg-gradient-celestial rounded mx-auto mb-2 flex items-center justify-center text-primary-foreground font-bold text-sm">L</div>
-              <div className="text-2xl font-bold text-primary">{songs.filter(s => s.category === 'louvor').length}</div>
-              <div className="text-sm text-muted-foreground">Louvor</div>
-            </CardContent>
-          </Card>
-          <Card className="shadow-gentle">
-            <CardContent className="p-4 text-center">
-              <div className="h-8 w-8 bg-gradient-divine rounded mx-auto mb-2 flex items-center justify-center text-accent-foreground font-bold text-sm">A</div>
-              <div className="text-2xl font-bold text-primary">{songs.filter(s => s.category === 'adoracao').length}</div>
-              <div className="text-sm text-muted-foreground">Adoração</div>
-            </CardContent>
-          </Card>
+            <Card className="shadow-gentle">
+              <CardContent className="p-4 text-center">
+                <Heart className="h-8 w-8 text-accent mx-auto mb-2" />
+                <div className="text-2xl font-bold text-primary">{songs.filter((s: Song) => s.is_favorite).length}</div>
+                <div className="text-sm text-muted-foreground">Favoritas</div>
+              </CardContent>
+            </Card>
+            <Card className="shadow-gentle">
+              <CardContent className="p-4 text-center">
+                <div className="h-8 w-8 bg-gradient-celestial rounded mx-auto mb-2 flex items-center justify-center text-primary-foreground font-bold text-sm">L</div>
+                <div className="text-2xl font-bold text-primary">{songs.filter((s: Song) => s.category === 'louvor').length}</div>
+                <div className="text-sm text-muted-foreground">Louvor</div>
+              </CardContent>
+            </Card>
+            <Card className="shadow-gentle">
+              <CardContent className="p-4 text-center">
+                <div className="h-8 w-8 bg-gradient-divine rounded mx-auto mb-2 flex items-center justify-center text-accent-foreground font-bold text-sm">A</div>
+                <div className="text-2xl font-bold text-primary">{songs.filter((s: Song) => s.category === 'adoracao').length}</div>
+                <div className="text-sm text-muted-foreground">Adoração</div>
+              </CardContent>
+            </Card>
         </div>
 
         {/* Songs Grid */}
@@ -174,7 +133,7 @@ const Musicas = () => {
                       <div className="flex-1">
                         <h3 className="text-xl font-semibold text-primary flex items-center gap-2">
                           {song.title}
-                          {song.isFavorite && <Heart className="h-5 w-5 text-accent fill-accent" />}
+                          {song.is_favorite && <Heart className="h-5 w-5 text-accent fill-accent" />}
                         </h3>
                         <p className="text-muted-foreground">{song.artist}</p>
                       </div>
@@ -186,14 +145,14 @@ const Musicas = () => {
                     <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                       <div className="flex items-center gap-1">
                         <span className="font-medium">Tom:</span>
-                        <span className="px-2 py-1 bg-muted rounded text-primary font-medium">{song.key}</span>
+                        <span className="px-2 py-1 bg-muted rounded text-primary font-medium">{song.musical_key || 'N/A'}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Clock className="h-4 w-4" />
-                        {song.bpm} BPM
+                        {song.bpm || 'N/A'} BPM
                       </div>
                       <div className="flex items-center gap-1">
-                        Última vez: {new Date(song.lastPlayed).toLocaleDateString('pt-BR')}
+                        Última vez: {song.last_played ? new Date(song.last_played).toLocaleDateString('pt-BR') : 'Nunca'}
                       </div>
                     </div>
                   </div>

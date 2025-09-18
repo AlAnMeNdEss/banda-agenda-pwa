@@ -3,19 +3,27 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import worshipHero from "@/assets/worship-hero.jpg";
+import { useEvents } from "@/hooks/useEvents";
+import { useSongs } from "@/hooks/useSongs";
 
 const Dashboard = () => {
-  // Mock data - será substituído pelo Supabase
-  const upcomingEvents = [
-    { id: 1, title: "Ensaio Geral", date: "2024-01-20", time: "19:00", type: "ensaio" },
-    { id: 2, title: "Culto Dominical", date: "2024-01-21", time: "18:30", type: "evento" },
-  ];
+  const { data: events = [] } = useEvents();
+  const { data: songs = [] } = useSongs();
+
+  // Get upcoming events (next 3)
+  const upcomingEvents = events
+    .filter(event => new Date(`${event.event_date}T${event.event_time}`) >= new Date())
+    .slice(0, 3);
 
   const stats = [
-    { label: "Músicas no Repertório", value: "127", icon: Music },
-    { label: "Próximos Eventos", value: "5", icon: Calendar },
-    { label: "Ensaios este Mês", value: "8", icon: Clock },
-    { label: "Membros Ativos", value: "12", icon: Users },
+    { label: "Músicas no Repertório", value: songs.length.toString(), icon: Music },
+    { label: "Próximos Eventos", value: upcomingEvents.length.toString(), icon: Calendar },
+    { 
+      label: "Ensaios este Mês", 
+      value: events.filter(e => e.event_type === 'ensaio').length.toString(), 
+      icon: Clock 
+    },
+    { label: "Favoritas", value: songs.filter(s => s.is_favorite).length.toString(), icon: Users },
   ];
 
   return (
@@ -81,15 +89,15 @@ const Dashboard = () => {
                     <div className="flex-1">
                       <h4 className="font-medium">{event.title}</h4>
                       <p className="text-sm text-muted-foreground">
-                        {event.date} às {event.time}
+                        {new Date(event.event_date).toLocaleDateString('pt-BR')} às {event.event_time}
                       </p>
                     </div>
                     <div className={`px-2 py-1 rounded text-xs font-medium ${
-                      event.type === 'ensaio' 
+                      event.event_type === 'ensaio' 
                         ? 'bg-accent/20 text-accent-foreground' 
                         : 'bg-primary/20 text-primary'
                     }`}>
-                      {event.type === 'ensaio' ? 'Ensaio' : 'Evento'}
+                      {event.event_type === 'ensaio' ? 'Ensaio' : 'Evento'}
                     </div>
                   </div>
                 ))}

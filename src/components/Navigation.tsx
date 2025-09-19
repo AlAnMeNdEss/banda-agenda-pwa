@@ -1,12 +1,8 @@
-import { Calendar, Home, Music, Menu, X } from "lucide-react";
+import { Calendar, Home, Music } from "lucide-react";
 import { NavLink } from "react-router-dom";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const Navigation = () => {
-  const [isOpen, setIsOpen] = useState(false);
-
   const navItems = [
     { to: "/", icon: Home, label: "Dashboard" },
     { to: "/agenda", icon: Calendar, label: "Agenda" },
@@ -14,56 +10,27 @@ const Navigation = () => {
   ];
 
   return (
-    <>
-      {/* Mobile Menu Button */}
-      <Button
-        variant="ghost"
-        size="icon"
-        className="md:hidden fixed top-4 right-4 z-50 bg-card/80 backdrop-blur-md shadow-gentle"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-      </Button>
-
-      {/* Mobile Overlay */}
-      {isOpen && (
-        <div 
-          className="md:hidden fixed inset-0 bg-background/80 backdrop-blur-md z-40"
-          onClick={() => setIsOpen(false)}
-        />
-      )}
-
-      {/* Navigation */}
-      <nav className={cn(
-        "fixed md:static top-0 left-0 h-full md:h-auto w-64 md:w-full bg-gradient-celestial md:bg-transparent p-6 md:p-4 transform transition-transform duration-300 z-40",
-        isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
-      )}>
-        <div className="flex flex-col md:flex-row gap-4 md:gap-2 mt-16 md:mt-0">
-          <div className="md:hidden mb-8">
-            <h2 className="text-xl font-bold text-primary-foreground">Ministério de Louvor</h2>
-          </div>
-          
-          {navItems.map(({ to, icon: Icon, label }) => (
-            <NavLink
-              key={to}
-              to={to}
-              className={({ isActive }) =>
-                cn(
-                  "flex items-center gap-3 px-4 py-3 md:py-2 rounded-lg transition-all duration-200 font-medium",
-                  isActive
-                    ? "bg-accent text-accent-foreground shadow-divine md:bg-primary md:text-primary-foreground"
-                    : "text-primary-foreground hover:bg-primary-glow/20 md:text-muted-foreground md:hover:bg-muted md:hover:text-foreground"
-                )
-              }
-              onClick={() => setIsOpen(false)}
-            >
-              <Icon className="h-5 w-5" />
-              <span>{label}</span>
-            </NavLink>
-          ))}
-        </div>
-      </nav>
-    </>
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-lg border-t border-border shadow-celestial">
+      <div className="flex items-center justify-around py-2 px-4 max-w-md mx-auto">
+        {navItems.map(({ to, icon: Icon, label }) => (
+          <NavLink
+            key={to}
+            to={to}
+            className={({ isActive }) =>
+              cn(
+                "flex flex-col items-center gap-1 py-2 px-3 rounded-lg transition-all duration-200 min-w-0 flex-1",
+                isActive
+                  ? "text-primary"
+                  : "text-muted-foreground hover:text-foreground"
+              )
+            }
+          >
+            <Icon className="h-5 w-5" />
+            <span className="text-xs font-medium truncate">{label}</span>
+          </NavLink>
+        ))}
+      </div>
+    </nav>
   );
 };
 

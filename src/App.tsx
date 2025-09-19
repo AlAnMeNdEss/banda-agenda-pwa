@@ -17,15 +17,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <div className="min-h-screen">
-          <div className="md:hidden">
-            <Navigation />
-          </div>
-          <div className="hidden md:block bg-card/50 backdrop-blur-md border-b sticky top-0 z-30">
-            <div className="max-w-7xl mx-auto">
-              <Navigation />
-            </div>
-          </div>
+        <div className="min-h-screen pb-20">
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/agenda" element={<Agenda />} />
@@ -33,6 +25,7 @@ const App = () => (
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <Navigation />
         </div>
       </BrowserRouter>
     </TooltipProvider>

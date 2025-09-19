@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 export interface Event {
   id: string;
@@ -14,6 +15,8 @@ export interface Event {
 }
 
 export const useEvents = () => {
+  const { user } = useAuth();
+  
   return useQuery({
     queryKey: ['events'],
     queryFn: async (): Promise<Event[]> => {
@@ -25,6 +28,7 @@ export const useEvents = () => {
       if (error) throw error;
       return (data || []) as Event[];
     },
+    enabled: !!user, // Only fetch when user is authenticated
   });
 };
 

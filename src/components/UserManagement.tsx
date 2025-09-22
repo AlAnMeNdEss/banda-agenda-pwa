@@ -71,7 +71,7 @@ const UserManagement = () => {
     
     try {
       // Call edge function to send invite email
-      const { error } = await supabase.functions.invoke('send-invite', {
+      const { data, error } = await supabase.functions.invoke('send-invite', {
         body: {
           email: inviteEmail,
           displayName: inviteDisplayName,
@@ -83,16 +83,17 @@ const UserManagement = () => {
       if (error) throw error;
 
       toast({
-        title: "Convite Enviado",
-        description: `Convite enviado para ${inviteEmail}`,
+        title: "Usuário Criado com Sucesso!",
+        description: `${inviteDisplayName} foi convidado. Senha temporária: ${data?.tempPassword || 'Não disponível'}. Compartilhe estas credenciais com o usuário.`,
       });
 
-      // Reset form
+      // Reset form and refresh profiles
       setInviteEmail('');
       setInviteDisplayName('');
       setInviteRole('member');
       setInviteMinistryFunction('');
       setInviteDialogOpen(false);
+      fetchProfiles();
     } catch (error) {
       console.error('Error sending invite:', error);
       toast({

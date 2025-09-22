@@ -9,6 +9,7 @@ interface Profile {
   role: 'admin' | 'leader' | 'musician' | 'member';
   ministry_function?: string;
   phone?: string;
+  team_id?: string;
 }
 
 interface AuthContextType {
@@ -16,6 +17,7 @@ interface AuthContextType {
   session: Session | null;
   profile: Profile | null;
   loading: boolean;
+  needsTeamSetup: boolean;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signUp: (email: string, password: string, displayName?: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
@@ -74,7 +76,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('*')
+        .select('*, teams(*)')
         .eq('user_id', userId)
         .single();
 
@@ -135,6 +137,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     session,
     profile,
     loading,
+    needsTeamSetup: user && profile && !profile.team_id,
     signIn,
     signUp,
     signOut,

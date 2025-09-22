@@ -10,36 +10,41 @@ export interface Event {
   event_time: string;
   event_type: 'evento' | 'ensaio';
   location: string | null;
+  team_id: string | null;
   created_at: string;
   updated_at: string;
 }
 
 export const useEvents = () => {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   
   return useQuery({
-    queryKey: ['events'],
+    queryKey: ['events', profile?.team_id],
     queryFn: async (): Promise<Event[]> => {
+      if (!profile?.team_id) return [];
+      
       const { data, error } = await supabase
         .from('events')
         .select('*')
+        .eq('team_id', profile.team_id)
         .order('event_date', { ascending: true });
       
       if (error) throw error;
       return (data || []) as Event[];
     },
-    enabled: !!user, // Only fetch when user is authenticated
+    enabled: !!user && !!profile?.team_id,
   });
 };
 
 export const useCreateEvent = () => {
   const queryClient = useQueryClient();
+  const { profile } = useAuth();
   
   return useMutation({
-    mutationFn: async (event: Omit<Event, 'id' | 'created_at' | 'updated_at'>) => {
+    mutationFn: async (event: Omit<Event, 'id' | 'created_at' | 'updated_at' | 'team_id'>) => {
       const { data, error } = await supabase
         .from('events')
-        .insert([event])
+        .insert([{ ...event, team_id: profile?.team_id }])
         .select()
         .single();
       

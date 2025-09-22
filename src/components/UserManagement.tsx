@@ -22,7 +22,7 @@ interface Profile {
 }
 
 const UserManagement = () => {
-  const { hasRole } = useAuth();
+  const { hasRole, profile } = useAuth();
   const { toast } = useToast();
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
@@ -50,6 +50,7 @@ const UserManagement = () => {
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
+        .eq('team_id', profile?.team_id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;

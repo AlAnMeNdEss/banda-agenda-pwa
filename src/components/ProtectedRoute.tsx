@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import TeamSetup from '@/components/TeamSetup';
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -8,7 +9,7 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
-  const { user, profile, loading, hasRole } = useAuth();
+  const { user, profile, loading, hasRole, needsTeamSetup } = useAuth();
   const location = useLocation();
 
   if (loading) {
@@ -21,6 +22,11 @@ const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
 
   if (!user) {
     return <Navigate to="/auth" state={{ from: location }} replace />;
+  }
+
+  // If user needs team setup, show team setup component
+  if (needsTeamSetup) {
+    return <TeamSetup onComplete={() => window.location.reload()} />;
   }
 
   if (requiredRole && !hasRole(requiredRole)) {

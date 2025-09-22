@@ -6,12 +6,14 @@ import worshipHero from "@/assets/worship-hero.jpg";
 import { useEvents } from "@/hooks/useEvents";
 import { useSongs } from "@/hooks/useSongs";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTeam } from "@/hooks/useTeam";
 import UserManagement from "@/components/UserManagement";
 
 const Dashboard = () => {
   const { data: events = [] } = useEvents();
   const { data: songs = [] } = useSongs();
   const { hasRole } = useAuth();
+  const { data: team } = useTeam();
 
   // Get upcoming events (next 3)
   const upcomingEvents = events
@@ -143,6 +145,16 @@ const Dashboard = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* Team Info for Admins */}
+        {hasRole('admin') && team && (
+          <div className="bg-gradient-celestial rounded-lg p-6 text-white mb-8">
+            <h2 className="text-xl font-bold mb-2">Informações da Equipe</h2>
+            <p className="text-white/90 mb-2">Equipe: {team.name}</p>
+            <p className="text-white/90 mb-4">Código da Equipe: <span className="font-bold tracking-widest">{team.team_code}</span></p>
+            <p className="text-sm text-white/80">Compartilhe o código acima para outros membros entrarem na equipe.</p>
+          </div>
+        )}
 
         {/* Gerenciamento de Usuários - Apenas para Admins */}
         {hasRole('admin') && (

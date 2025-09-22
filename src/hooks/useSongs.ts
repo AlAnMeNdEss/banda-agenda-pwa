@@ -13,36 +13,41 @@ export interface Song {
   lyrics: string | null;
   chords: string | null;
   last_played: string | null;
+  team_id: string | null;
   created_at: string;
   updated_at: string;
 }
 
 export const useSongs = () => {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   
   return useQuery({
-    queryKey: ['songs'],
+    queryKey: ['songs', profile?.team_id],
     queryFn: async (): Promise<Song[]> => {
+      if (!profile?.team_id) return [];
+      
       const { data, error } = await supabase
         .from('songs')
         .select('*')
+        .eq('team_id', profile.team_id)
         .order('title', { ascending: true });
       
       if (error) throw error;
       return (data || []) as Song[];
     },
-    enabled: !!user, // Only fetch when user is authenticated
+    enabled: !!user && !!profile?.team_id,
   });
 };
 
 export const useCreateSong = () => {
   const queryClient = useQueryClient();
+  const { profile } = useAuth();
   
   return useMutation({
-    mutationFn: async (song: Omit<Song, 'id' | 'created_at' | 'updated_at'>) => {
+    mutationFn: async (song: Omit<Song, 'id' | 'created_at' | 'updated_at' | 'team_id'>) => {
       const { data, error } = await supabase
         .from('songs')
-        .insert([song])
+        .insert([{ ...song, team_id: profile?.team_id }])
         .select()
         .single();
       

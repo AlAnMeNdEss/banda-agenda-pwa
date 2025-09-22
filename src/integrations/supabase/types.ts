@@ -23,6 +23,7 @@ export type Database = {
           event_type: string
           id: string
           location: string | null
+          team_id: string | null
           title: string
           updated_at: string
         }
@@ -34,6 +35,7 @@ export type Database = {
           event_type: string
           id?: string
           location?: string | null
+          team_id?: string | null
           title: string
           updated_at?: string
         }
@@ -45,10 +47,19 @@ export type Database = {
           event_type?: string
           id?: string
           location?: string | null
+          team_id?: string | null
           title?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "events_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       invites: {
         Row: {
@@ -94,6 +105,7 @@ export type Database = {
           ministry_function: string | null
           phone: string | null
           role: Database["public"]["Enums"]["app_role"]
+          team_id: string | null
           updated_at: string
           user_id: string
         }
@@ -104,6 +116,7 @@ export type Database = {
           ministry_function?: string | null
           phone?: string | null
           role?: Database["public"]["Enums"]["app_role"]
+          team_id?: string | null
           updated_at?: string
           user_id: string
         }
@@ -114,10 +127,19 @@ export type Database = {
           ministry_function?: string | null
           phone?: string | null
           role?: Database["public"]["Enums"]["app_role"]
+          team_id?: string | null
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       songs: {
         Row: {
@@ -131,6 +153,7 @@ export type Database = {
           last_played: string | null
           lyrics: string | null
           musical_key: string | null
+          team_id: string | null
           title: string
           updated_at: string
         }
@@ -145,6 +168,7 @@ export type Database = {
           last_played?: string | null
           lyrics?: string | null
           musical_key?: string | null
+          team_id?: string | null
           title: string
           updated_at?: string
         }
@@ -159,7 +183,43 @@ export type Database = {
           last_played?: string | null
           lyrics?: string | null
           musical_key?: string | null
+          team_id?: string | null
           title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "songs_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      teams: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          name: string
+          team_code: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          name: string
+          team_code: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          name?: string
+          team_code?: string
           updated_at?: string
         }
         Relationships: []
@@ -187,6 +247,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      generate_team_code: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       get_user_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]

@@ -5,10 +5,13 @@ import { Link } from "react-router-dom";
 import worshipHero from "@/assets/worship-hero.jpg";
 import { useEvents } from "@/hooks/useEvents";
 import { useSongs } from "@/hooks/useSongs";
+import { useAuth } from "@/contexts/AuthContext";
+import UserManagement from "@/components/UserManagement";
 
 const Dashboard = () => {
   const { data: events = [] } = useEvents();
   const { data: songs = [] } = useSongs();
+  const { hasRole } = useAuth();
 
   // Get upcoming events (next 3)
   const upcomingEvents = events
@@ -65,7 +68,7 @@ const Dashboard = () => {
           ))}
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="grid md:grid-cols-2 gap-8 mb-8">
           {/* Próximos Eventos */}
           <Card className="shadow-gentle">
             <CardHeader>
@@ -140,6 +143,13 @@ const Dashboard = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* Gerenciamento de Usuários - Apenas para Admins */}
+        {hasRole('admin') && (
+          <div className="mb-8">
+            <UserManagement />
+          </div>
+        )}
       </div>
     </div>
   );

@@ -27,6 +27,14 @@ const TeamSetup = ({ onComplete }: TeamSetupProps) => {
 
     setLoading(true);
     try {
+      // Get current user first
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+      if (userError || !userData.user) {
+        throw new Error('Usuário não autenticado');
+      }
+
+      const userId = userData.user.id;
+
       // Generate team code
       const { data: codeData, error: codeError } = await supabase
         .rpc('generate_team_code');
@@ -39,7 +47,7 @@ const TeamSetup = ({ onComplete }: TeamSetupProps) => {
         .insert({
           name: teamName,
           team_code: codeData,
-          created_by: (await supabase.auth.getUser()).data.user?.id
+          created_by: userId
         })
         .select()
         .single();
@@ -53,7 +61,7 @@ const TeamSetup = ({ onComplete }: TeamSetupProps) => {
           team_id: team.id,
           role: 'admin'
         })
-        .eq('user_id', (await supabase.auth.getUser()).data.user?.id);
+        .eq('user_id', userId);
 
       if (profileError) throw profileError;
 
@@ -61,7 +69,7 @@ const TeamSetup = ({ onComplete }: TeamSetupProps) => {
       const { error: roleError } = await supabase
         .from('user_roles')
         .update({ role: 'admin' })
-        .eq('user_id', (await supabase.auth.getUser()).data.user?.id);
+        .eq('user_id', userId);
 
       if (roleError) throw roleError;
 
@@ -94,6 +102,14 @@ const TeamSetup = ({ onComplete }: TeamSetupProps) => {
 
     setLoading(true);
     try {
+      // Get current user first
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+      if (userError || !userData.user) {
+        throw new Error('Usuário não autenticado');
+      }
+
+      const userId = userData.user.id;
+
       // Find team by code
       const { data: team, error: teamError } = await supabase
         .from('teams')
@@ -112,7 +128,7 @@ const TeamSetup = ({ onComplete }: TeamSetupProps) => {
           team_id: team.id,
           role: 'member'
         })
-        .eq('user_id', (await supabase.auth.getUser()).data.user?.id);
+        .eq('user_id', userId);
 
       if (profileError) throw profileError;
 
@@ -120,7 +136,7 @@ const TeamSetup = ({ onComplete }: TeamSetupProps) => {
       const { error: roleError } = await supabase
         .from('user_roles')
         .update({ role: 'member' })
-        .eq('user_id', (await supabase.auth.getUser()).data.user?.id);
+        .eq('user_id', userId);
 
       if (roleError) throw roleError;
 

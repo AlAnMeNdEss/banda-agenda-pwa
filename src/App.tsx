@@ -8,6 +8,7 @@ import Agenda from "./pages/Agenda";
 import Musicas from "./pages/Musicas";
 import Membros from "./pages/Membros";
 import Favoritas from "./pages/Favoritas";
+import Contatos from "./pages/Contatos";
 import Auth from "./pages/Auth";
 import Navigation from "./components/Navigation";
 import NotFound from "./pages/NotFound";
@@ -49,6 +50,11 @@ const App = () => (
               <Route path="/favoritas" element={
                 <ProtectedRoute>
                   <Favoritas />
+                </ProtectedRoute>
+              } />
+              <Route path="/contatos" element={
+                <ProtectedRoute>
+                  <Contatos />
                 </ProtectedRoute>
               } />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

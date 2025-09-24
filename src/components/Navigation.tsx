@@ -1,4 +1,4 @@
-import { Calendar, Home, Music } from "lucide-react";
+import { Calendar, Home, Music, Users } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import UserProfile from "@/components/UserProfile";
@@ -10,7 +10,8 @@ const Navigation = () => {
   const navItems = [
     { to: "/", icon: Home, label: "Dashboard" },
     { to: "/agenda", icon: Calendar, label: "Agenda" },
-    { to: "/musicas", icon: Music, label: "Músicas" }
+    { to: "/musicas", icon: Music, label: "Músicas" },
+    { to: "/contatos", icon: Users, label: "Contatos" }
   ];
 
   return (

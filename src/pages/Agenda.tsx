@@ -5,10 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useEvents, Event } from "@/hooks/useEvents";
+import { useAuth } from "@/contexts/AuthContext";
+import EventForm from "@/components/EventForm";
 
 const Agenda = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const { data: events = [], isLoading } = useEvents();
+  const { hasRole } = useAuth();
 
   const filteredEvents = events.filter((event: Event) =>
     event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -55,10 +58,14 @@ const Agenda = () => {
               className="pl-10"
             />
           </div>
-          <Button className="bg-gradient-celestial hover:shadow-celestial">
-            <Plus className="h-4 w-4 mr-2" />
-            Novo Evento
-          </Button>
+          {hasRole('admin') && (
+            <EventForm>
+              <Button className="bg-gradient-celestial hover:shadow-celestial">
+                <Plus className="h-4 w-4 mr-2" />
+                Novo Evento
+              </Button>
+            </EventForm>
+          )}
         </div>
 
         {/* Events Grid */}
@@ -108,13 +115,15 @@ const Agenda = () => {
                     </div>
                   </div>
 
-                  {/* Actions */}
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm">Editar</Button>
-                    <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">
-                      Excluir
-                    </Button>
-                  </div>
+                  {/* Actions - Only show for admins */}
+                  {hasRole('admin') && (
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm">Editar</Button>
+                      <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">
+                        Excluir
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>

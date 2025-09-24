@@ -8,6 +8,9 @@ import { useSongs } from "@/hooks/useSongs";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTeam } from "@/hooks/useTeam";
 import UserManagement from "@/components/UserManagement";
+import AdminActions from "@/components/AdminActions";
+import UserActions from "@/components/UserActions";
+import TeamMembers from "@/components/TeamMembers";
 
 const Dashboard = () => {
   const { data: events = [] } = useEvents();
@@ -110,40 +113,13 @@ const Dashboard = () => {
             </CardContent>
           </Card>
 
-          {/* Ações Rápidas */}
-          <Card className="shadow-gentle">
-            <CardHeader>
-              <CardTitle>Ações Rápidas</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-4">
-                <Button asChild className="h-20 flex-col gap-2 bg-gradient-celestial hover:shadow-celestial">
-                  <Link to="/agenda?new=event">
-                    <Calendar className="h-6 w-6" />
-                    Novo Evento
-                  </Link>
-                </Button>
-                <Button asChild variant="secondary" className="h-20 flex-col gap-2 hover:shadow-gentle">
-                  <Link to="/agenda?new=rehearsal">
-                    <Clock className="h-6 w-6" />
-                    Agendar Ensaio
-                  </Link>
-                </Button>
-                <Button asChild className="h-20 flex-col gap-2 bg-gradient-divine hover:shadow-divine">
-                  <Link to="/musicas?new=true">
-                    <Music className="h-6 w-6" />
-                    Nova Música
-                  </Link>
-                </Button>
-                <Button asChild variant="outline" className="h-20 flex-col gap-2 hover:shadow-gentle">
-                  <Link to="/musicas">
-                    <Music className="h-6 w-6" />
-                    Ver Repertório
-                  </Link>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          {/* Ações baseadas no papel do usuário */}
+          {hasRole('admin') ? <AdminActions /> : <UserActions />}
+        </div>
+
+        {/* Membros da Equipe - Para todos os usuários */}
+        <div className="mb-8">
+          <TeamMembers />
         </div>
 
         {/* Team Info for Admins */}

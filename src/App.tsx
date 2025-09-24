@@ -6,6 +6,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Agenda from "./pages/Agenda";
 import Musicas from "./pages/Musicas";
+import Membros from "./pages/Membros";
+import Favoritas from "./pages/Favoritas";
 import Auth from "./pages/Auth";
 import Navigation from "./components/Navigation";
 import NotFound from "./pages/NotFound";
@@ -37,6 +39,16 @@ const App = () => (
               <Route path="/musicas" element={
                 <ProtectedRoute>
                   <Musicas />
+                </ProtectedRoute>
+              } />
+              <Route path="/membros" element={
+                <ProtectedRoute>
+                  <Membros />
+                </ProtectedRoute>
+              } />
+              <Route path="/favoritas" element={
+                <ProtectedRoute>
+                  <Favoritas />
                 </ProtectedRoute>
               } />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

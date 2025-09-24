@@ -14,39 +14,125 @@ export type Database = {
   }
   public: {
     Tables: {
-      events: {
+      event_participants: {
+        Row: {
+          confirmed: boolean | null
+          created_at: string
+          event_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          confirmed?: boolean | null
+          created_at?: string
+          event_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          confirmed?: boolean | null
+          created_at?: string
+          event_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_participants_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_songs: {
         Row: {
           created_at: string
+          event_id: string
+          id: string
+          song_id: string
+          song_order: number | null
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          id?: string
+          song_id: string
+          song_order?: number | null
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          id?: string
+          song_id?: string
+          song_order?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_songs_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_songs_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "songs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events: {
+        Row: {
+          attachments: Json | null
+          created_at: string
           description: string | null
+          end_time: string | null
           event_date: string
           event_time: string
           event_type: string
           id: string
           location: string | null
+          notes: string | null
+          participants: Json | null
+          songs: Json | null
           team_id: string | null
           title: string
           updated_at: string
         }
         Insert: {
+          attachments?: Json | null
           created_at?: string
           description?: string | null
+          end_time?: string | null
           event_date: string
           event_time: string
           event_type: string
           id?: string
           location?: string | null
+          notes?: string | null
+          participants?: Json | null
+          songs?: Json | null
           team_id?: string | null
           title: string
           updated_at?: string
         }
         Update: {
+          attachments?: Json | null
           created_at?: string
           description?: string | null
+          end_time?: string | null
           event_date?: string
           event_time?: string
           event_type?: string
           id?: string
           location?: string | null
+          notes?: string | null
+          participants?: Json | null
+          songs?: Json | null
           team_id?: string | null
           title?: string
           updated_at?: string

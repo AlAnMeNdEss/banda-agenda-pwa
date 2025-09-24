@@ -8,8 +8,13 @@ export interface Event {
   description: string | null;
   event_date: string;
   event_time: string;
+  end_time: string | null;
   event_type: 'evento' | 'ensaio';
   location: string | null;
+  notes: string | null;
+  participants: string | null;
+  songs: string | null;
+  attachments: string | null;
   team_id: string | null;
   created_at: string;
   updated_at: string;

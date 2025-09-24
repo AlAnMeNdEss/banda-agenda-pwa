@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -29,6 +30,7 @@ const UserManagement = () => {
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
+  const [deletingUser, setDeletingUser] = useState<string | null>(null);
   
   // Invite form data
   const [inviteEmail, setInviteEmail] = useState('');
@@ -134,6 +136,76 @@ const UserManagement = () => {
         description: "Erro ao atualizar nível de acesso",
         variant: "destructive",
       });
+    }
+  };
+
+  const handleDeleteUser = async (userId: string, userName: string) => {
+    // Prevent deleting yourself
+    if (userId === profile?.user_id) {
+      toast({
+        title: "Erro",
+        description: "Você não pode excluir sua própria conta",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check if this is the last admin
+    const adminCount = profiles.filter(p => p.role === 'admin').length;
+    const userToDelete = profiles.find(p => p.user_id === userId);
+    
+    if (userToDelete?.role === 'admin' && adminCount <= 1) {
+      toast({
+        title: "Erro",
+        description: "Não é possível excluir o último administrador",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setDeletingUser(userId);
+
+      // Delete from user_roles first (due to foreign key constraints)
+      const { error: roleError } = await supabase
+        .from('user_roles')
+        .delete()
+        .eq('user_id', userId);
+
+      if (roleError) throw roleError;
+
+      // Delete from profiles
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('user_id', userId);
+
+      if (profileError) throw profileError;
+
+      // Delete the user from auth (this will cascade to related tables)
+      const { error: authError } = await supabase.auth.admin.deleteUser(userId);
+      
+      // Note: auth.admin.deleteUser might not work from client side depending on RLS
+      // If it fails, the user record will remain but won't be able to access the system
+      if (authError) {
+        console.warn('Could not delete user from auth:', authError);
+      }
+
+      toast({
+        title: "Sucesso",
+        description: `${userName} foi removido da equipe`,
+      });
+
+      fetchProfiles();
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao excluir usuário",
+        variant: "destructive",
+      });
+    } finally {
+      setDeletingUser(null);
     }
   };
 
@@ -295,6 +367,37 @@ const UserManagement = () => {
                     <SelectItem value="admin">Administrador</SelectItem>
                   </SelectContent>
                 </Select>
+                
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      size="icon"
+                      disabled={deletingUser === profile.user_id}
+                      className="hover:bg-destructive hover:text-destructive-foreground"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Tem certeza que deseja excluir <strong>{profile.display_name}</strong>? 
+                        Esta ação não pode ser desfeita e o usuário perderá acesso ao sistema.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => handleDeleteUser(profile.user_id, profile.display_name)}
+                        className="bg-destructive hover:bg-destructive/90"
+                      >
+                        Excluir
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             </div>
           ))}

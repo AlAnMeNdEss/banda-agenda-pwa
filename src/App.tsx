@@ -6,7 +6,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Agenda from "./pages/Agenda";
 import Musicas from "./pages/Musicas";
-import Membros from "./pages/Membros";
 import Favoritas from "./pages/Favoritas";
 import Contatos from "./pages/Contatos";
 import Auth from "./pages/Auth";
@@ -40,11 +39,6 @@ const App = () => (
               <Route path="/musicas" element={
                 <ProtectedRoute>
                   <Musicas />
-                </ProtectedRoute>
-              } />
-              <Route path="/membros" element={
-                <ProtectedRoute>
-                  <Membros />
                 </ProtectedRoute>
               } />
               <Route path="/favoritas" element={

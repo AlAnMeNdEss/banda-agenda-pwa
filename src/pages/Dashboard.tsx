@@ -7,10 +7,8 @@ import { useEvents } from "@/hooks/useEvents";
 import { useSongs } from "@/hooks/useSongs";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTeam } from "@/hooks/useTeam";
-import UserManagement from "@/components/UserManagement";
 import AdminActions from "@/components/AdminActions";
 import UserActions from "@/components/UserActions";
-import TeamMembers from "@/components/TeamMembers";
 
 const Dashboard = () => {
   const { data: events = [] } = useEvents();
@@ -117,11 +115,6 @@ const Dashboard = () => {
           {hasRole('admin') ? <AdminActions /> : <UserActions />}
         </div>
 
-        {/* Membros da Equipe - Para todos os usuários */}
-        <div className="mb-8">
-          <TeamMembers />
-        </div>
-
         {/* Team Info for Admins */}
         {hasRole('admin') && team && (
           <div className="bg-gradient-celestial rounded-lg p-6 text-white mb-8">
@@ -129,13 +122,6 @@ const Dashboard = () => {
             <p className="text-white/90 mb-2">Equipe: {team.name}</p>
             <p className="text-white/90 mb-4">Código da Equipe: <span className="font-bold tracking-widest">{team.team_code}</span></p>
             <p className="text-sm text-white/80">Compartilhe o código acima para outros membros entrarem na equipe.</p>
-          </div>
-        )}
-
-        {/* Gerenciamento de Usuários - Apenas para Admins */}
-        {hasRole('admin') && (
-          <div className="mb-8">
-            <UserManagement />
           </div>
         )}
       </div>

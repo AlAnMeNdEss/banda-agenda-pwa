@@ -14,6 +14,8 @@ import { useCreateEvent } from "@/hooks/useEvents";
 import { useToast } from "@/hooks/use-toast";
 import ParticipantSelector from "@/components/ParticipantSelector";
 import SongSelector from "@/components/SongSelector";
+import { useAddEventParticipant } from "@/hooks/useEventParticipants";
+import { useAddEventSong } from "@/hooks/useEventSongs";
 
 const eventSchema = z.object({
   title: z.string().min(1, "Título é obrigatório").max(100, "Título deve ter no máximo 100 caracteres"),
@@ -43,6 +45,8 @@ const EventForm = ({ children }: EventFormProps) => {
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
   const createEvent = useCreateEvent();
+  const addEventParticipant = useAddEventParticipant();
+  const addEventSong = useAddEventSong();
 
   const form = useForm<EventFormData>({
     resolver: zodResolver(eventSchema),
@@ -72,12 +76,31 @@ const EventForm = ({ children }: EventFormProps) => {
         event_type: data.event_type,
         location: data.location || null,
         notes: data.notes || null,
-        participants: JSON.stringify(data.participants),
-        songs: JSON.stringify(data.songs),
+        participants: null,
+        songs: null,
         attachments: JSON.stringify(data.attachments),
       };
       
-      await createEvent.mutateAsync(eventData);
+      const event = await createEvent.mutateAsync(eventData);
+      
+      // Adicionar participantes à tabela event_participants
+      if (data.participants.length > 0) {
+        await Promise.all(
+          data.participants.map(userId =>
+            addEventParticipant.mutateAsync({ eventId: event.id, userId })
+          )
+        );
+      }
+      
+      // Adicionar músicas à tabela event_songs
+      if (data.songs.length > 0) {
+        await Promise.all(
+          data.songs.map((songId, index) =>
+            addEventSong.mutateAsync({ eventId: event.id, songId, order: index })
+          )
+        );
+      }
+      
       toast({
         title: "Evento criado!",
         description: "O evento foi adicionado à agenda com sucesso.",

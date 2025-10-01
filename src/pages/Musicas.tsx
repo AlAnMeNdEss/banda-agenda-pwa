@@ -5,12 +5,23 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useSongs, Song } from "@/hooks/useSongs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { useSongs, useDeleteSong, Song } from "@/hooks/useSongs";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
+import SongForm from "@/components/SongForm";
 
 const Musicas = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("todas");
+  const [songToView, setSongToView] = useState<Song | null>(null);
+  const [songToDelete, setSongToDelete] = useState<Song | null>(null);
   const { data: songs = [], isLoading } = useSongs();
+  const { hasRole } = useAuth();
+  const { toast } = useToast();
+  const deleteSong = useDeleteSong();
+  
+  const canManageSongs = hasRole('admin') || hasRole('leader');
 
   const categories = [
     { value: "todas", label: "Todas" },
@@ -76,10 +87,14 @@ const Musicas = () => {
             </SelectContent>
           </Select>
 
-          <Button className="bg-gradient-divine hover:shadow-divine">
-            <Plus className="h-4 w-4 mr-2" />
-            Nova Música
-          </Button>
+          {canManageSongs && (
+            <SongForm>
+              <Button className="bg-gradient-divine hover:shadow-divine">
+                <Plus className="h-4 w-4 mr-2" />
+                Nova Música
+              </Button>
+            </SongForm>
+          )}
         </div>
 
         {/* Stats */}
@@ -159,11 +174,28 @@ const Musicas = () => {
 
                   {/* Actions */}
                   <div className="flex gap-2">
-                    <Button variant="outline" size="sm">Ver Cifra</Button>
-                    <Button variant="outline" size="sm">Editar</Button>
-                    <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">
-                      Excluir
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setSongToView(song)}
+                    >
+                      Ver Cifra
                     </Button>
+                    {canManageSongs && (
+                      <>
+                        <SongForm song={song}>
+                          <Button variant="outline" size="sm">Editar</Button>
+                        </SongForm>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="text-destructive hover:text-destructive"
+                          onClick={() => setSongToDelete(song)}
+                        >
+                          Excluir
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </div>
               </CardContent>
@@ -187,6 +219,90 @@ const Musicas = () => {
           </Card>
         )}
       </div>
+
+      {/* Dialog para visualizar cifra */}
+      <Dialog open={!!songToView} onOpenChange={() => setSongToView(null)}>
+        <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{songToView?.title}</DialogTitle>
+            <DialogDescription>{songToView?.artist}</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="flex gap-4 text-sm text-muted-foreground">
+              <span>Tom: <strong className="text-primary">{songToView?.musical_key || 'N/A'}</strong></span>
+              <span>BPM: <strong className="text-primary">{songToView?.bpm || 'N/A'}</strong></span>
+              <Badge className={getCategoryColor(songToView?.category || 'louvor')}>
+                {songToView?.category === 'louvor' ? 'Louvor' : 'Adoração'}
+              </Badge>
+            </div>
+            
+            {songToView?.lyrics && (
+              <div>
+                <h3 className="font-semibold text-primary mb-2">Letra</h3>
+                <div className="whitespace-pre-wrap text-sm bg-muted p-4 rounded">
+                  {songToView.lyrics}
+                </div>
+              </div>
+            )}
+            
+            {songToView?.chords && (
+              <div>
+                <h3 className="font-semibold text-primary mb-2">Cifra</h3>
+                <div className="whitespace-pre-wrap text-sm bg-muted p-4 rounded font-mono">
+                  {songToView.chords}
+                </div>
+              </div>
+            )}
+
+            {!songToView?.lyrics && !songToView?.chords && (
+              <p className="text-center text-muted-foreground py-8">
+                Nenhuma letra ou cifra disponível para esta música.
+              </p>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog para confirmar exclusão */}
+      <Dialog open={!!songToDelete} onOpenChange={() => setSongToDelete(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirmar Exclusão</DialogTitle>
+            <DialogDescription>
+              Tem certeza que deseja excluir a música "{songToDelete?.title}"? Esta ação não pode ser desfeita.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-3">
+            <Button variant="outline" onClick={() => setSongToDelete(null)}>
+              Cancelar
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={async () => {
+                if (songToDelete) {
+                  try {
+                    await deleteSong.mutateAsync(songToDelete.id);
+                    toast({
+                      title: "Música excluída",
+                      description: "A música foi removida do repertório.",
+                    });
+                    setSongToDelete(null);
+                  } catch (error) {
+                    toast({
+                      title: "Erro ao excluir",
+                      description: "Não foi possível excluir a música.",
+                      variant: "destructive",
+                    });
+                  }
+                }
+              }}
+              disabled={deleteSong.isPending}
+            >
+              {deleteSong.isPending ? "Excluindo..." : "Excluir"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

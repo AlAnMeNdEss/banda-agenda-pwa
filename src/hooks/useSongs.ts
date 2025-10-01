@@ -59,3 +59,42 @@ export const useCreateSong = () => {
     },
   });
 };
+
+export const useUpdateSong = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async ({ id, ...song }: Partial<Song> & { id: string }) => {
+      const { data, error } = await supabase
+        .from('songs')
+        .update(song)
+        .eq('id', id)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['songs'] });
+    },
+  });
+};
+
+export const useDeleteSong = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (songId: string) => {
+      const { error } = await supabase
+        .from('songs')
+        .delete()
+        .eq('id', songId);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['songs'] });
+    },
+  });
+};

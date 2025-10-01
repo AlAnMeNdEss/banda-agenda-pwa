@@ -7,9 +7,12 @@ import { Badge } from "@/components/ui/badge";
 import { useEvents, Event } from "@/hooks/useEvents";
 import { useAuth } from "@/contexts/AuthContext";
 import EventForm from "@/components/EventForm";
+import EventDetails from "@/components/EventDetails";
 
 const Agenda = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [detailsOpen, setDetailsOpen] = useState(false);
   const { data: events = [], isLoading } = useEvents();
   const { hasRole } = useAuth();
 
@@ -71,7 +74,14 @@ const Agenda = () => {
         {/* Events Grid */}
         <div className="grid gap-6">
           {filteredEvents.map((event) => (
-            <Card key={event.id} className="shadow-gentle hover:shadow-celestial transition-all duration-300">
+            <Card 
+              key={event.id} 
+              className="shadow-gentle hover:shadow-celestial transition-all duration-300 cursor-pointer"
+              onClick={() => {
+                setSelectedEvent(event);
+                setDetailsOpen(true);
+              }}
+            >
               <CardContent className="p-6">
                 <div className="flex flex-col md:flex-row md:items-center gap-4">
                   {/* Date Badge */}
@@ -126,9 +136,15 @@ const Agenda = () => {
                   )}
                 </div>
               </CardContent>
-            </Card>
-          ))}
+          </Card>
+        ))}
         </div>
+
+        <EventDetails 
+          event={selectedEvent}
+          open={detailsOpen}
+          onOpenChange={setDetailsOpen}
+        />
 
         {filteredEvents.length === 0 && (
           <Card className="shadow-gentle">

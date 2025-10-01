@@ -102,7 +102,8 @@ const ParticipantSelector = ({ selectedParticipants, onParticipantsChange }: Par
               <CardContent className="p-3 flex items-center gap-3">
                 <Checkbox 
                   checked={selectedParticipants.includes(member.user_id)}
-                  onChange={() => handleParticipantToggle(member.user_id)}
+                  onCheckedChange={() => handleParticipantToggle(member.user_id)}
+                  onClick={(e) => e.stopPropagation()}
                 />
                 <div className="flex-1">
                   <div className="flex items-center gap-2">

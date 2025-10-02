@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Mail, Trash2, Edit3, UserPlus, Phone, Calendar, Shield, UserX } from 'lucide-react';
+import { Plus, Mail, Trash2, Edit3, UserPlus, Phone, Calendar, Shield, UserX, Music } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -342,12 +342,12 @@ const UserManagement = () => {
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="ministryFunction">Função no Ministério</Label>
+                  <Label htmlFor="ministryFunction">Função/Instrumento</Label>
                   <Input
                     id="ministryFunction"
                     value={inviteMinistryFunction}
                     onChange={(e) => setInviteMinistryFunction(e.target.value)}
-                    placeholder="Ex: Vocal, Guitarra, Bateria..."
+                    placeholder="Ex: Vocal, Guitarra, Bateria, Baixo, Teclado..."
                   />
                 </div>
                 <div>
@@ -399,8 +399,8 @@ const UserManagement = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
                       {profile.ministry_function && (
                         <div className="flex items-center gap-2 text-muted-foreground">
-                          <UserPlus className="h-3 w-3" />
-                          <span>{profile.ministry_function}</span>
+                          <Music className="h-3 w-3 text-primary" />
+                          <span className="font-medium">{profile.ministry_function}</span>
                         </div>
                       )}
                       {profile.phone && (
@@ -513,12 +513,12 @@ const UserManagement = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="editMinistryFunction">Função no Ministério</Label>
+                <Label htmlFor="editMinistryFunction">Função/Instrumento</Label>
                 <Input
                   id="editMinistryFunction"
                   value={editMinistryFunction}
                   onChange={(e) => setEditMinistryFunction(e.target.value)}
-                  placeholder="Ex: Vocal, Guitarra, Bateria..."
+                  placeholder="Ex: Vocal, Guitarra, Bateria, Baixo, Teclado..."
                 />
               </div>
               <div>

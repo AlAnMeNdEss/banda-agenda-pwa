@@ -121,53 +121,79 @@ const EventForm = ({ children }: EventFormProps) => {
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Novo Evento</DialogTitle>
+      <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-hidden flex flex-col">
+        <DialogHeader className="pb-4 border-b">
+          <DialogTitle className="text-2xl font-bold bg-gradient-celestial bg-clip-text text-transparent">
+            ✨ Novo Evento
+          </DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <Tabs defaultValue="basic" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="basic">Básico</TabsTrigger>
-                <TabsTrigger value="participants">Participantes</TabsTrigger>
-                <TabsTrigger value="songs">Repertório</TabsTrigger>
-                <TabsTrigger value="attachments">Anexos</TabsTrigger>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col h-full">
+            <Tabs defaultValue="basic" className="w-full flex-1 overflow-hidden flex flex-col">
+              <TabsList className="grid w-full grid-cols-4 h-auto p-1 bg-muted/30">
+                <TabsTrigger value="basic" className="data-[state=active]:bg-gradient-celestial data-[state=active]:text-white">
+                  <Calendar className="h-4 w-4 mr-2" />
+                  Básico
+                </TabsTrigger>
+                <TabsTrigger value="participants" className="data-[state=active]:bg-gradient-celestial data-[state=active]:text-white">
+                  <Users className="h-4 w-4 mr-2" />
+                  Participantes
+                </TabsTrigger>
+                <TabsTrigger value="songs" className="data-[state=active]:bg-gradient-celestial data-[state=active]:text-white">
+                  <Music className="h-4 w-4 mr-2" />
+                  Repertório
+                </TabsTrigger>
+                <TabsTrigger value="attachments" className="data-[state=active]:bg-gradient-celestial data-[state=active]:text-white">
+                  <Paperclip className="h-4 w-4 mr-2" />
+                  Anexos
+                </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="basic" className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="title"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Título do Evento</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Ex: Ensaio de Louvor, Culto da Família" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <TabsContent value="basic" className="space-y-4 overflow-y-auto flex-1 pr-2">
+                <div className="space-y-4 animate-fade-in">
+                  <FormField
+                    control={form.control}
+                    name="title"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center gap-2 text-base">
+                          <FileText className="h-4 w-4 text-primary" />
+                          Título do Evento
+                        </FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="Ex: Ensaio de Louvor, Culto da Família" 
+                            className="h-11"
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                <FormField
-                  control={form.control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Descrição</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder="Descreva o evento (opcional)" 
-                          className="resize-none" 
-                          rows={3}
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                  <FormField
+                    control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center gap-2 text-base">
+                          <FileText className="h-4 w-4 text-primary" />
+                          Descrição
+                        </FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="Descreva o evento (opcional)" 
+                            className="resize-none min-h-[80px]" 
+                            rows={3}
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <FormField
@@ -175,9 +201,12 @@ const EventForm = ({ children }: EventFormProps) => {
                     name="event_date"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Data</FormLabel>
+                        <FormLabel className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-primary" />
+                          Data
+                        </FormLabel>
                         <FormControl>
-                          <Input type="date" {...field} />
+                          <Input type="date" className="h-11" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -189,9 +218,12 @@ const EventForm = ({ children }: EventFormProps) => {
                     name="event_time"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Início</FormLabel>
+                        <FormLabel className="flex items-center gap-2">
+                          <Clock className="h-4 w-4 text-primary" />
+                          Início
+                        </FormLabel>
                         <FormControl>
-                          <Input type="time" {...field} />
+                          <Input type="time" className="h-11" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -203,9 +235,12 @@ const EventForm = ({ children }: EventFormProps) => {
                     name="end_time"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Término (opcional)</FormLabel>
+                        <FormLabel className="flex items-center gap-2">
+                          <Clock className="h-4 w-4 text-muted-foreground" />
+                          Término
+                        </FormLabel>
                         <FormControl>
-                          <Input type="time" {...field} />
+                          <Input type="time" className="h-11" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -240,9 +275,16 @@ const EventForm = ({ children }: EventFormProps) => {
                   name="location"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Local</FormLabel>
+                      <FormLabel className="flex items-center gap-2 text-base">
+                        <MapPin className="h-4 w-4 text-primary" />
+                        Local
+                      </FormLabel>
                       <FormControl>
-                        <Input placeholder="Igreja, casa de membro, estúdio, online..." {...field} />
+                        <Input 
+                          placeholder="Igreja, casa de membro, estúdio, online..." 
+                          className="h-11"
+                          {...field} 
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -364,21 +406,22 @@ const EventForm = ({ children }: EventFormProps) => {
               </TabsContent>
             </Tabs>
 
-            <div className="flex justify-end gap-3 pt-4">
+            <div className="flex justify-end gap-3 pt-4 border-t mt-4">
               <Button 
                 type="button" 
                 variant="outline" 
                 onClick={() => setOpen(false)}
                 disabled={createEvent.isPending}
+                className="min-w-[100px]"
               >
                 Cancelar
               </Button>
               <Button 
                 type="submit" 
-                className="bg-gradient-celestial hover:shadow-celestial"
+                className="bg-gradient-celestial hover:shadow-celestial min-w-[140px]"
                 disabled={createEvent.isPending}
               >
-                {createEvent.isPending ? "Criando..." : "Criar Evento"}
+                {createEvent.isPending ? "Criando..." : "✨ Criar Evento"}
               </Button>
             </div>
           </form>

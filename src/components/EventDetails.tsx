@@ -118,62 +118,71 @@ const EventDetails = ({ event, open, onOpenChange }: EventDetailsProps) => {
 
             {/* Repertoire */}
             {eventSongs.length > 0 && (
-              <Card>
-                <CardHeader>
+              <Card className="border-primary/20">
+                <CardHeader className="bg-gradient-to-r from-primary/5 to-transparent">
                   <CardTitle className="flex items-center gap-2 text-lg">
-                    <Music className="h-5 w-5" />
+                    <Music className="h-5 w-5 text-primary" />
                     Repertório ({eventSongs.length} músicas)
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
+                <CardContent className="pt-6">
+                  <div className="space-y-6">
                     {eventSongs.map((eventSong, index) => (
-                      <Card key={eventSong.id} className="bg-muted/30">
-                        <CardContent className="pt-4">
-                          <div className="flex items-start gap-3">
-                            <Badge variant="outline" className="mt-1">
-                              {index + 1}
-                            </Badge>
-                            <div className="flex-1 space-y-2">
-                              <div>
-                                <h4 className="font-semibold">{eventSong.song?.title}</h4>
+                      <Card key={eventSong.id} className="border-2 hover:border-primary/30 transition-colors">
+                        <CardContent className="pt-6">
+                          <div className="space-y-4">
+                            {/* Header */}
+                            <div className="flex items-start gap-3 pb-3 border-b">
+                              <Badge variant="default" className="bg-gradient-celestial text-white text-base px-3 py-1">
+                                {index + 1}
+                              </Badge>
+                              <div className="flex-1">
+                                <h4 className="font-bold text-lg mb-1">{eventSong.song?.title}</h4>
                                 <p className="text-sm text-muted-foreground">
                                   {eventSong.song?.artist}
                                 </p>
                               </div>
-                              
                               {eventSong.song?.musical_key && (
                                 <div className="flex gap-2 text-xs">
-                                  <Badge variant="secondary">
+                                  <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
                                     Tom: {eventSong.song.musical_key}
                                   </Badge>
                                   {eventSong.song.bpm && (
-                                    <Badge variant="secondary">
+                                    <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
                                       {eventSong.song.bpm} BPM
                                     </Badge>
                                   )}
                                 </div>
                               )}
+                            </div>
 
+                            {/* Chords & Lyrics Grid */}
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                               {eventSong.song?.chords && (
-                                <div className="mt-3 p-3 bg-background rounded-md">
-                                  <div className="text-xs font-medium text-muted-foreground mb-2">
-                                    Cifra:
+                                <div className="space-y-2">
+                                  <div className="flex items-center gap-2 text-sm font-semibold text-primary">
+                                    <Music className="h-4 w-4" />
+                                    Cifra
                                   </div>
-                                  <pre className="text-xs font-mono whitespace-pre-wrap">
-                                    {eventSong.song.chords}
-                                  </pre>
+                                  <div className="p-4 bg-muted/50 rounded-lg border border-primary/10">
+                                    <pre className="text-sm font-mono whitespace-pre-wrap leading-relaxed">
+                                      {eventSong.song.chords}
+                                    </pre>
+                                  </div>
                                 </div>
                               )}
 
                               {eventSong.song?.lyrics && (
-                                <div className="mt-3 p-3 bg-background rounded-md">
-                                  <div className="text-xs font-medium text-muted-foreground mb-2">
-                                    Letra:
+                                <div className="space-y-2">
+                                  <div className="flex items-center gap-2 text-sm font-semibold text-primary">
+                                    <FileText className="h-4 w-4" />
+                                    Letra
                                   </div>
-                                  <pre className="text-xs whitespace-pre-wrap">
-                                    {eventSong.song.lyrics}
-                                  </pre>
+                                  <div className="p-4 bg-muted/30 rounded-lg border border-muted">
+                                    <pre className="text-sm whitespace-pre-wrap leading-relaxed">
+                                      {eventSong.song.lyrics}
+                                    </pre>
+                                  </div>
                                 </div>
                               )}
                             </div>

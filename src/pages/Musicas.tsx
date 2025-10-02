@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { Music, Search, Plus, Heart, Clock } from "lucide-react";
+import { Music, Search, Plus, Heart, Clock, CheckSquare, Square } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useSongs, useDeleteSong, Song } from "@/hooks/useSongs";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
@@ -16,12 +17,33 @@ const Musicas = () => {
   const [categoryFilter, setCategoryFilter] = useState("todas");
   const [songToView, setSongToView] = useState<Song | null>(null);
   const [songToDelete, setSongToDelete] = useState<Song | null>(null);
+  const [selectedSongs, setSelectedSongs] = useState<string[]>([]);
   const { data: songs = [], isLoading } = useSongs();
   const { hasRole } = useAuth();
   const { toast } = useToast();
   const deleteSong = useDeleteSong();
   
   const canManageSongs = hasRole('admin') || hasRole('leader');
+
+  const toggleSongSelection = (songId: string) => {
+    setSelectedSongs(prev => 
+      prev.includes(songId) 
+        ? prev.filter(id => id !== songId)
+        : [...prev, songId]
+    );
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedSongs.length === filteredSongs.length) {
+      setSelectedSongs([]);
+    } else {
+      setSelectedSongs(filteredSongs.map(song => song.id));
+    }
+  };
+
+  const clearSelection = () => {
+    setSelectedSongs([]);
+  };
 
   const categories = [
     { value: "todas", label: "Todas" },
@@ -63,37 +85,85 @@ const Musicas = () => {
         </div>
 
         {/* Actions Bar */}
-        <div className="flex flex-col md:flex-row gap-4 mb-8">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-            <Input
-              placeholder="Buscar músicas..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-          
-          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-            <SelectTrigger className="w-full md:w-48">
-              <SelectValue placeholder="Categoria" />
-            </SelectTrigger>
-            <SelectContent>
-              {categories.map(category => (
-                <SelectItem key={category.value} value={category.value}>
-                  {category.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <div className="flex flex-col gap-4 mb-8">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Input
+                placeholder="Buscar músicas..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            
+            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+              <SelectTrigger className="w-full md:w-48">
+                <SelectValue placeholder="Categoria" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map(category => (
+                  <SelectItem key={category.value} value={category.value}>
+                    {category.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-          {canManageSongs && (
-            <SongForm>
-              <Button className="bg-gradient-divine hover:shadow-divine">
-                <Plus className="h-4 w-4 mr-2" />
-                Nova Música
-              </Button>
-            </SongForm>
+            {canManageSongs && (
+              <SongForm>
+                <Button className="bg-gradient-divine hover:shadow-divine">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Nova Música
+                </Button>
+              </SongForm>
+            )}
+          </div>
+
+          {/* Selection Actions */}
+          {canManageSongs && filteredSongs.length > 0 && (
+            <Card className="bg-primary/5 border-primary/20">
+              <CardContent className="p-4">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 justify-between">
+                  <div className="flex items-center gap-3">
+                    <Checkbox
+                      checked={selectedSongs.length === filteredSongs.length && filteredSongs.length > 0}
+                      onCheckedChange={toggleSelectAll}
+                    />
+                    <span className="text-sm font-medium">
+                      {selectedSongs.length > 0 
+                        ? `${selectedSongs.length} música(s) selecionada(s)` 
+                        : 'Selecionar todas'}
+                    </span>
+                  </div>
+                  {selectedSongs.length > 0 && (
+                    <div className="flex gap-2 w-full sm:w-auto">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={clearSelection}
+                        className="flex-1 sm:flex-none"
+                      >
+                        Limpar Seleção
+                      </Button>
+                      <Button 
+                        size="sm"
+                        className="bg-gradient-celestial flex-1 sm:flex-none"
+                        onClick={() => {
+                          toast({
+                            title: "Músicas Selecionadas",
+                            description: `${selectedSongs.length} música(s) pronta(s) para adicionar ao evento`,
+                          });
+                        }}
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Usar no Evento
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
           )}
         </div>
 
@@ -132,9 +202,25 @@ const Musicas = () => {
         {/* Songs Grid */}
         <div className="grid gap-4">
           {filteredSongs.map((song) => (
-            <Card key={song.id} className="shadow-gentle hover:shadow-celestial transition-all duration-300">
+            <Card 
+              key={song.id} 
+              className={`shadow-gentle hover:shadow-celestial transition-all duration-300 ${
+                selectedSongs.includes(song.id) ? 'ring-2 ring-primary bg-primary/5' : ''
+              }`}
+            >
               <CardContent className="p-6">
                 <div className="flex flex-col md:flex-row md:items-center gap-4">
+                  {/* Checkbox for selection */}
+                  {canManageSongs && (
+                    <div className="flex-shrink-0">
+                      <Checkbox
+                        checked={selectedSongs.includes(song.id)}
+                        onCheckedChange={() => toggleSongSelection(song.id)}
+                        className="h-5 w-5"
+                      />
+                    </div>
+                  )}
+
                   {/* Song Icon */}
                   <div className="flex-shrink-0">
                     <div className="w-16 h-16 bg-gradient-celestial rounded-lg flex items-center justify-center">

@@ -22,7 +22,6 @@ const SongSelector = ({ selectedSongs, onSongsChange }: SongSelectorProps) => {
   );
 
   const handleSongToggle = (songId: string) => {
-    console.log('[SongSelector] handleSongToggle called', { songId, selectedSongs });
     const isSelected = selectedSongs.includes(songId);
     if (isSelected) {
       onSongsChange(selectedSongs.filter(id => id !== songId));

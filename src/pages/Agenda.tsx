@@ -1,13 +1,15 @@
 import { useState } from "react";
-import { Calendar, Clock, Plus, Search } from "lucide-react";
+import { Calendar, Clock, Plus, Search, List, CalendarDays } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useEvents, Event } from "@/hooks/useEvents";
 import { useAuth } from "@/contexts/AuthContext";
 import EventForm from "@/components/EventForm";
 import EventDetails from "@/components/EventDetails";
+import CalendarView from "@/components/CalendarView";
 
 const Agenda = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -43,7 +45,7 @@ const Agenda = () => {
 
   return (
     <div className="min-h-screen bg-gradient-worship">
-      <div className="max-w-6xl mx-auto px-6 py-12">
+      <div className="max-w-7xl mx-auto px-6 py-12">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-primary mb-2">Agenda de Eventos</h1>
@@ -71,94 +73,121 @@ const Agenda = () => {
           )}
         </div>
 
-        {/* Events Grid */}
-        <div className="grid gap-6">
-          {filteredEvents.map((event) => (
-            <Card 
-              key={event.id} 
-              className="shadow-gentle hover:shadow-celestial transition-all duration-300 cursor-pointer"
-              onClick={() => {
+        {/* Tabs para alternar entre visualizações */}
+        <Tabs defaultValue="list" className="w-full">
+          <TabsList className="grid w-full max-w-md grid-cols-2 mb-6">
+            <TabsTrigger value="list" className="flex items-center gap-2">
+              <List className="h-4 w-4" />
+              Lista
+            </TabsTrigger>
+            <TabsTrigger value="calendar" className="flex items-center gap-2">
+              <CalendarDays className="h-4 w-4" />
+              Calendário
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Vista de Lista */}
+          <TabsContent value="list" className="space-y-6">
+            <div className="grid gap-6">
+              {filteredEvents.map((event) => (
+                <Card 
+                  key={event.id} 
+                  className="shadow-gentle hover:shadow-celestial transition-all duration-300 cursor-pointer"
+                  onClick={() => {
+                    setSelectedEvent(event);
+                    setDetailsOpen(true);
+                  }}
+                >
+                  <CardContent className="p-6">
+                    <div className="flex flex-col md:flex-row md:items-center gap-4">
+                      {/* Date Badge */}
+                      <div className="flex-shrink-0">
+                        <div className="bg-gradient-celestial text-primary-foreground rounded-lg p-4 text-center min-w-[120px]">
+                          <div className="text-sm font-medium opacity-90">
+                            {formatDate(event.event_date).split(' ')[1]} {formatDate(event.event_date).split(' ')[2]}
+                          </div>
+                          <div className="text-2xl font-bold">
+                            {formatDate(event.event_date).split(' ')[0]}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Event Details */}
+                      <div className="flex-1 space-y-2">
+                        <div className="flex items-start gap-3">
+                          <h3 className="text-xl font-semibold text-primary flex-1">{event.title}</h3>
+                          <Badge 
+                            variant={event.event_type === 'evento' ? 'default' : 'secondary'}
+                            className={event.event_type === 'evento' 
+                              ? 'bg-gradient-divine text-accent-foreground' 
+                              : 'bg-muted text-muted-foreground'
+                            }
+                          >
+                            {event.event_type === 'evento' ? 'Evento' : 'Ensaio'}
+                          </Badge>
+                        </div>
+                        
+                        <p className="text-muted-foreground">{event.description || 'Sem descrição'}</p>
+                        
+                        <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+                          <div className="flex items-center gap-1">
+                            <Clock className="h-4 w-4" />
+                            {event.event_time}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Calendar className="h-4 w-4" />
+                            {event.location || 'Local não informado'}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Actions - Only show for admins */}
+                      {hasRole('admin') && (
+                        <div className="flex gap-2">
+                          <Button variant="outline" size="sm">Editar</Button>
+                          <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">
+                            Excluir
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {filteredEvents.length === 0 && (
+              <Card className="shadow-gentle">
+                <CardContent className="p-12 text-center">
+                  <Calendar className="h-16 w-16 text-muted-foreground/50 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-muted-foreground mb-2">
+                    Nenhum evento encontrado
+                  </h3>
+                  <p className="text-muted-foreground">
+                    {searchTerm ? 'Tente um termo de busca diferente.' : 'Adicione o primeiro evento à agenda.'}
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+
+          {/* Vista de Calendário */}
+          <TabsContent value="calendar">
+            <CalendarView 
+              events={filteredEvents}
+              onEventClick={(event) => {
                 setSelectedEvent(event);
                 setDetailsOpen(true);
               }}
-            >
-              <CardContent className="p-6">
-                <div className="flex flex-col md:flex-row md:items-center gap-4">
-                  {/* Date Badge */}
-                  <div className="flex-shrink-0">
-                    <div className="bg-gradient-celestial text-primary-foreground rounded-lg p-4 text-center min-w-[120px]">
-                      <div className="text-sm font-medium opacity-90">
-                        {formatDate(event.event_date).split(' ')[1]} {formatDate(event.event_date).split(' ')[2]}
-                      </div>
-                      <div className="text-2xl font-bold">
-                        {formatDate(event.event_date).split(' ')[0]}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Event Details */}
-                  <div className="flex-1 space-y-2">
-                    <div className="flex items-start gap-3">
-                      <h3 className="text-xl font-semibold text-primary flex-1">{event.title}</h3>
-                      <Badge 
-                        variant={event.event_type === 'evento' ? 'default' : 'secondary'}
-                        className={event.event_type === 'evento' 
-                          ? 'bg-gradient-divine text-accent-foreground' 
-                          : 'bg-muted text-muted-foreground'
-                        }
-                      >
-                        {event.event_type === 'evento' ? 'Evento' : 'Ensaio'}
-                      </Badge>
-                    </div>
-                    
-                    <p className="text-muted-foreground">{event.description || 'Sem descrição'}</p>
-                    
-                    <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <Clock className="h-4 w-4" />
-                        {event.event_time}
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Calendar className="h-4 w-4" />
-                        {event.location || 'Local não informado'}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Actions - Only show for admins */}
-                  {hasRole('admin') && (
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm">Editar</Button>
-                      <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">
-                        Excluir
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-          </Card>
-        ))}
-        </div>
+            />
+          </TabsContent>
+        </Tabs>
 
         <EventDetails 
           event={selectedEvent}
           open={detailsOpen}
           onOpenChange={setDetailsOpen}
         />
-
-        {filteredEvents.length === 0 && (
-          <Card className="shadow-gentle">
-            <CardContent className="p-12 text-center">
-              <Calendar className="h-16 w-16 text-muted-foreground/50 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-muted-foreground mb-2">
-                Nenhum evento encontrado
-              </h3>
-              <p className="text-muted-foreground">
-                {searchTerm ? 'Tente um termo de busca diferente.' : 'Adicione o primeiro evento à agenda.'}
-              </p>
-            </CardContent>
-          </Card>
-        )}
       </div>
     </div>
   );

@@ -22,6 +22,7 @@ const SongSelector = ({ selectedSongs, onSongsChange }: SongSelectorProps) => {
   );
 
   const handleSongToggle = (songId: string) => {
+    console.log('[SongSelector] handleSongToggle called', { songId, selectedSongs });
     const isSelected = selectedSongs.includes(songId);
     if (isSelected) {
       onSongsChange(selectedSongs.filter(id => id !== songId));
@@ -101,7 +102,10 @@ const SongSelector = ({ selectedSongs, onSongsChange }: SongSelectorProps) => {
                     ? 'ring-2 ring-primary bg-accent/50' 
                     : 'hover:bg-accent/30'
                 }`}
-                onClick={() => handleSongToggle(song.id)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleSongToggle(song.id);
+                }}
               >
                 <CardContent className="p-3 flex items-center gap-3">
                   <Checkbox 

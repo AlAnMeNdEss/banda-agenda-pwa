@@ -1,12 +1,16 @@
-import { Calendar, Clock, MapPin, Music, Users, FileText } from "lucide-react";
+import { useState } from "react";
+import { Calendar, Clock, MapPin, Music, Users, FileText, ChevronDown, ChevronUp } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
 import { Event } from "@/hooks/useEvents";
 import { useEventSongs } from "@/hooks/useEventSongs";
 import { useEventParticipants } from "@/hooks/useEventParticipants";
+import { format, parseISO } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 interface EventDetailsProps {
   event: Event | null;
@@ -17,16 +21,19 @@ interface EventDetailsProps {
 const EventDetails = ({ event, open, onOpenChange }: EventDetailsProps) => {
   const { data: eventSongs = [] } = useEventSongs(event?.id || '');
   const { data: participants = [] } = useEventParticipants(event?.id || '');
+  const [expandedChords, setExpandedChords] = useState<Record<string, boolean>>({});
 
   if (!event) return null;
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('pt-BR', {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric'
-    });
+    return format(parseISO(dateString), "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
+  };
+
+  const toggleChords = (songId: string) => {
+    setExpandedChords(prev => ({
+      ...prev,
+      [songId]: !prev[songId]
+    }));
   };
 
   return (
@@ -156,36 +163,60 @@ const EventDetails = ({ event, open, onOpenChange }: EventDetailsProps) => {
                               )}
                             </div>
 
-                            {/* Chords & Lyrics Grid */}
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                              {eventSong.song?.chords && (
-                                <div className="space-y-2">
-                                  <div className="flex items-center gap-2 text-sm font-semibold text-primary">
-                                    <Music className="h-4 w-4" />
-                                    Cifra
-                                  </div>
-                                  <div className="p-4 bg-muted/50 rounded-lg border border-primary/10">
-                                    <pre className="text-sm font-mono whitespace-pre-wrap leading-relaxed">
-                                      {eventSong.song.chords}
-                                    </pre>
-                                  </div>
-                                </div>
-                              )}
+                            {/* Toggle Chords Button */}
+                            {eventSong.song?.chords && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => toggleChords(eventSong.id)}
+                                className="w-full flex items-center justify-center gap-2"
+                              >
+                                {expandedChords[eventSong.id] ? (
+                                  <>
+                                    <ChevronUp className="h-4 w-4" />
+                                    Esconder Cifra
+                                  </>
+                                ) : (
+                                  <>
+                                    <ChevronDown className="h-4 w-4" />
+                                    Mostrar Cifra
+                                  </>
+                                )}
+                              </Button>
+                            )}
 
-                              {eventSong.song?.lyrics && (
-                                <div className="space-y-2">
-                                  <div className="flex items-center gap-2 text-sm font-semibold text-primary">
-                                    <FileText className="h-4 w-4" />
-                                    Letra
+                            {/* Chords & Lyrics Grid */}
+                            {expandedChords[eventSong.id] && (
+                              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                {eventSong.song?.chords && (
+                                  <div className="space-y-2">
+                                    <div className="flex items-center gap-2 text-sm font-semibold text-primary">
+                                      <Music className="h-4 w-4" />
+                                      Cifra
+                                    </div>
+                                    <div className="p-4 bg-muted/50 rounded-lg border border-primary/10">
+                                      <pre className="text-sm font-mono whitespace-pre-wrap leading-relaxed">
+                                        {eventSong.song.chords}
+                                      </pre>
+                                    </div>
                                   </div>
-                                  <div className="p-4 bg-muted/30 rounded-lg border border-muted">
-                                    <pre className="text-sm whitespace-pre-wrap leading-relaxed">
-                                      {eventSong.song.lyrics}
-                                    </pre>
+                                )}
+
+                                {eventSong.song?.lyrics && (
+                                  <div className="space-y-2">
+                                    <div className="flex items-center gap-2 text-sm font-semibold text-primary">
+                                      <FileText className="h-4 w-4" />
+                                      Letra
+                                    </div>
+                                    <div className="p-4 bg-muted/30 rounded-lg border border-muted">
+                                      <pre className="text-sm whitespace-pre-wrap leading-relaxed">
+                                        {eventSong.song.lyrics}
+                                      </pre>
+                                    </div>
                                   </div>
-                                </div>
-                              )}
-                            </div>
+                                )}
+                              </div>
+                            )}
                           </div>
                         </CardContent>
                       </Card>

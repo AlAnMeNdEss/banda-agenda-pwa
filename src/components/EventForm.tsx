@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useCreateEvent } from "@/hooks/useEvents";
+import { useCreateEvent, useUpdateEvent, Event } from "@/hooks/useEvents";
 import { useToast } from "@/hooks/use-toast";
 import ParticipantSelector from "@/components/ParticipantSelector";
 import SongSelector from "@/components/SongSelector";
@@ -39,14 +39,19 @@ type EventFormData = z.infer<typeof eventSchema>;
 
 interface EventFormProps {
   children: React.ReactNode;
+  event?: Event | null;
+  onOpenChange?: (open: boolean) => void;
 }
 
-const EventForm = ({ children }: EventFormProps) => {
+const EventForm = ({ children, event, onOpenChange }: EventFormProps) => {
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
   const createEvent = useCreateEvent();
+  const updateEvent = useUpdateEvent();
   const addEventParticipant = useAddEventParticipant();
   const addEventSong = useAddEventSong();
+  
+  const isEditing = !!event;
 
   const form = useForm<EventFormData>({
     resolver: zodResolver(eventSchema),
@@ -65,6 +70,24 @@ const EventForm = ({ children }: EventFormProps) => {
     },
   });
 
+  useEffect(() => {
+    if (event && open) {
+      form.reset({
+        title: event.title,
+        description: event.description || "",
+        event_date: event.event_date,
+        event_time: event.event_time,
+        end_time: event.end_time || "",
+        event_type: event.event_type,
+        location: event.location || "",
+        notes: event.notes || "",
+        participants: [],
+        songs: [],
+        attachments: event.attachments ? JSON.parse(event.attachments) : [],
+      });
+    }
+  }, [event, open, form]);
+
   const onSubmit = async (data: EventFormData) => {
     try {
       const eventData = {
@@ -81,50 +104,63 @@ const EventForm = ({ children }: EventFormProps) => {
         attachments: JSON.stringify(data.attachments),
       };
       
-      const event = await createEvent.mutateAsync(eventData);
-      
-      // Adicionar participantes à tabela event_participants
-      if (data.participants.length > 0) {
-        await Promise.all(
-          data.participants.map(userId =>
-            addEventParticipant.mutateAsync({ eventId: event.id, userId })
-          )
-        );
+      if (isEditing && event) {
+        await updateEvent.mutateAsync({ id: event.id, ...eventData });
+        toast({
+          title: "Evento atualizado!",
+          description: "As alterações foram salvas com sucesso.",
+        });
+      } else {
+        const newEvent = await createEvent.mutateAsync(eventData);
+        
+        // Adicionar participantes à tabela event_participants
+        if (data.participants.length > 0) {
+          await Promise.all(
+            data.participants.map(userId =>
+              addEventParticipant.mutateAsync({ eventId: newEvent.id, userId })
+            )
+          );
+        }
+        
+        // Adicionar músicas à tabela event_songs
+        if (data.songs.length > 0) {
+          await Promise.all(
+            data.songs.map((songId, index) =>
+              addEventSong.mutateAsync({ eventId: newEvent.id, songId, order: index })
+            )
+          );
+        }
+        
+        toast({
+          title: "Evento criado!",
+          description: "O evento foi adicionado à agenda com sucesso.",
+        });
       }
       
-      // Adicionar músicas à tabela event_songs
-      if (data.songs.length > 0) {
-        await Promise.all(
-          data.songs.map((songId, index) =>
-            addEventSong.mutateAsync({ eventId: event.id, songId, order: index })
-          )
-        );
-      }
-      
-      toast({
-        title: "Evento criado!",
-        description: "O evento foi adicionado à agenda com sucesso.",
-      });
       form.reset();
       setOpen(false);
+      onOpenChange?.(false);
     } catch (error) {
       toast({
-        title: "Erro ao criar evento",
-        description: "Ocorreu um erro ao criar o evento. Tente novamente.",
+        title: isEditing ? "Erro ao atualizar evento" : "Erro ao criar evento",
+        description: "Ocorreu um erro. Tente novamente.",
         variant: "destructive",
       });
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={(newOpen) => {
+      setOpen(newOpen);
+      onOpenChange?.(newOpen);
+    }}>
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader className="pb-4 border-b">
           <DialogTitle className="text-2xl font-bold bg-gradient-celestial bg-clip-text text-transparent">
-            ✨ Novo Evento
+            {isEditing ? "✏️ Editar Evento" : "✨ Novo Evento"}
           </DialogTitle>
         </DialogHeader>
         <Form {...form}>
@@ -410,8 +446,11 @@ const EventForm = ({ children }: EventFormProps) => {
               <Button 
                 type="button" 
                 variant="outline" 
-                onClick={() => setOpen(false)}
-                disabled={createEvent.isPending}
+                onClick={() => {
+                  setOpen(false);
+                  onOpenChange?.(false);
+                }}
+                disabled={createEvent.isPending || updateEvent.isPending}
                 className="min-w-[100px]"
               >
                 Cancelar
@@ -419,9 +458,12 @@ const EventForm = ({ children }: EventFormProps) => {
               <Button 
                 type="submit" 
                 className="bg-gradient-celestial hover:shadow-celestial min-w-[140px]"
-                disabled={createEvent.isPending}
+                disabled={createEvent.isPending || updateEvent.isPending}
               >
-                {createEvent.isPending ? "Criando..." : "✨ Criar Evento"}
+                {isEditing 
+                  ? (updateEvent.isPending ? "Salvando..." : "💾 Salvar")
+                  : (createEvent.isPending ? "Criando..." : "✨ Criar Evento")
+                }
               </Button>
             </div>
           </form>

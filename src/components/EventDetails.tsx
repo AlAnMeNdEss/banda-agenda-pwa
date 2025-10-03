@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Calendar, Clock, MapPin, Music, Users, FileText, ChevronDown, ChevronUp } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
@@ -22,6 +22,21 @@ const EventDetails = ({ event, open, onOpenChange }: EventDetailsProps) => {
   const { data: eventSongs = [] } = useEventSongs(event?.id || '');
   const { data: participants = [] } = useEventParticipants(event?.id || '');
   const [expandedChords, setExpandedChords] = useState<Record<string, boolean>>({});
+
+  // Expand all chords by default when dialog opens
+  useEffect(() => {
+    if (open && eventSongs.length > 0) {
+      const initialExpanded: Record<string, boolean> = {};
+      eventSongs.forEach(eventSong => {
+        if (eventSong.song?.chords) {
+          initialExpanded[eventSong.id] = true;
+        }
+      });
+      setExpandedChords(initialExpanded);
+    } else if (!open) {
+      setExpandedChords({});
+    }
+  }, [open, eventSongs]);
 
   if (!event) return null;
 

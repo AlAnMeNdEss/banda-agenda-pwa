@@ -5,18 +5,23 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useEvents, Event } from "@/hooks/useEvents";
+import { useEvents, Event, useDeleteEvent } from "@/hooks/useEvents";
 import { useAuth } from "@/contexts/AuthContext";
 import EventForm from "@/components/EventForm";
 import EventDetails from "@/components/EventDetails";
 import CalendarView from "@/components/CalendarView";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
 
 const Agenda = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const [deletingEventId, setDeletingEventId] = useState<string | null>(null);
   const { data: events = [], isLoading } = useEvents();
   const { hasRole } = useAuth();
+  const deleteEvent = useDeleteEvent();
+  const { toast } = useToast();
 
   const filteredEvents = events.filter((event: Event) =>
     event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -30,6 +35,25 @@ const Agenda = () => {
       month: 'short',
       year: 'numeric'
     });
+  };
+
+  const handleDeleteEvent = async () => {
+    if (!deletingEventId) return;
+    
+    try {
+      await deleteEvent.mutateAsync(deletingEventId);
+      toast({
+        title: "Evento excluído",
+        description: "O evento foi excluído com sucesso.",
+      });
+      setDeletingEventId(null);
+    } catch (error) {
+      toast({
+        title: "Erro ao excluir",
+        description: "Não foi possível excluir o evento.",
+        variant: "destructive",
+      });
+    }
   };
 
   if (isLoading) {
@@ -143,9 +167,19 @@ const Agenda = () => {
 
                       {/* Actions - Only show for admins */}
                       {hasRole('admin') && (
-                        <div className="flex gap-2">
-                          <Button variant="outline" size="sm">Editar</Button>
-                          <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">
+                        <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+                          <EventForm event={event}>
+                            <Button variant="outline" size="sm">Editar</Button>
+                          </EventForm>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="text-destructive hover:text-destructive"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setDeletingEventId(event.id);
+                            }}
+                          >
                             Excluir
                           </Button>
                         </div>
@@ -188,6 +222,23 @@ const Agenda = () => {
           open={detailsOpen}
           onOpenChange={setDetailsOpen}
         />
+
+        <AlertDialog open={!!deletingEventId} onOpenChange={(open) => !open && setDeletingEventId(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+              <AlertDialogDescription>
+                Tem certeza que deseja excluir este evento? Esta ação não pode ser desfeita.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction onClick={handleDeleteEvent} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                Excluir
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );

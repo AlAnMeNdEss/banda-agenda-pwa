@@ -106,7 +106,8 @@ const SongSelector = ({ selectedSongs, onSongsChange }: SongSelectorProps) => {
                 <CardContent className="p-3 flex items-center gap-3">
                   <Checkbox 
                     checked={selectedSongs.includes(song.id)}
-                    onChange={() => handleSongToggle(song.id)}
+                    onCheckedChange={() => handleSongToggle(song.id)}
+                    onClick={(e) => e.stopPropagation()}
                   />
                   <div className="flex-1">
                     <div className="flex items-center gap-2">

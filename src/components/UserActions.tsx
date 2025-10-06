@@ -24,7 +24,7 @@ const UserActions = () => {
             </Link>
           </Button>
           <Button asChild variant="outline" className="h-20 flex-col gap-2 hover:shadow-gentle">
-            <Link to="/membros">
+            <Link to="/contatos">
               <Users className="h-6 w-6" />
               Membros da Equipe
             </Link>

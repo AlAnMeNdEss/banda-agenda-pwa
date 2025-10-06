@@ -109,29 +109,42 @@ const EventDetails = ({ event, open, onOpenChange }: EventDetailsProps) => {
 
             {/* Participants */}
             {participants.length > 0 && (
-              <Card>
-                <CardHeader>
+              <Card className="border-primary/20">
+                <CardHeader className="bg-gradient-to-r from-primary/5 to-transparent">
                   <CardTitle className="flex items-center gap-2 text-lg">
-                    <Users className="h-5 w-5" />
-                    Participantes ({participants.length})
+                    <Users className="h-5 w-5 text-primary" />
+                    Equipe do Evento ({participants.length})
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {participants.map((participant) => (
-                      <div 
+                      <Card 
                         key={participant.user_id}
-                        className="flex items-center justify-between p-2 rounded-lg bg-muted/50"
+                        className="border hover:border-primary/30 transition-colors"
                       >
-                        <span className="text-sm font-medium">
-                          {participant.profile?.display_name || 'Sem nome'}
-                        </span>
-                        {participant.confirmed && (
-                          <Badge variant="outline" className="text-xs">
-                            Confirmado
-                          </Badge>
-                        )}
-                      </div>
+                        <CardContent className="p-4">
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="font-semibold text-base">
+                                {participant.profile?.display_name || 'Sem nome'}
+                              </span>
+                              {participant.confirmed && (
+                                <Badge variant="default" className="text-xs bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20">
+                                  ✓ Confirmado
+                                </Badge>
+                              )}
+                            </div>
+                            {participant.profile?.ministry_function && (
+                              <div className="flex items-center gap-2">
+                                <Badge variant="secondary" className="text-xs">
+                                  {participant.profile.ministry_function}
+                                </Badge>
+                              </div>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
                     ))}
                   </div>
                 </CardContent>
@@ -140,98 +153,104 @@ const EventDetails = ({ event, open, onOpenChange }: EventDetailsProps) => {
 
             {/* Repertoire */}
             {eventSongs.length > 0 && (
-              <Card className="border-primary/20">
-                <CardHeader className="bg-gradient-to-r from-primary/5 to-transparent">
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <Music className="h-5 w-5 text-primary" />
-                    Repertório ({eventSongs.length} músicas)
+              <Card className="border-2 border-primary/30 shadow-lg">
+                <CardHeader className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border-b">
+                  <CardTitle className="flex items-center gap-2 text-xl">
+                    <Music className="h-6 w-6 text-primary" />
+                    Repertório Musical ({eventSongs.length} {eventSongs.length === 1 ? 'música' : 'músicas'})
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-6">
                   <div className="space-y-6">
                     {eventSongs.map((eventSong, index) => (
-                      <Card key={eventSong.id} className="border-2 hover:border-primary/30 transition-colors">
+                      <Card key={eventSong.id} className="border-2 border-primary/20 hover:border-primary/40 transition-all shadow-md">
                         <CardContent className="pt-6">
                           <div className="space-y-4">
-                            {/* Header */}
-                            <div className="flex items-start gap-3 pb-3 border-b">
-                              <Badge variant="default" className="bg-gradient-celestial text-white text-base px-3 py-1">
-                                {index + 1}
+                            {/* Header com informações principais */}
+                            <div className="flex items-start gap-3 pb-4 border-b-2 border-primary/10">
+                              <Badge variant="default" className="bg-gradient-celestial text-white text-lg px-4 py-2 font-bold shadow-md">
+                                #{index + 1}
                               </Badge>
-                              <div className="flex-1">
-                                <h4 className="font-bold text-lg mb-1">{eventSong.song?.title}</h4>
-                                <p className="text-sm text-muted-foreground">
+                              <div className="flex-1 space-y-2">
+                                <h4 className="font-bold text-xl text-primary">{eventSong.song?.title}</h4>
+                                <p className="text-base text-muted-foreground font-medium">
                                   {eventSong.song?.artist}
                                 </p>
-                              </div>
-                              {eventSong.song?.musical_key && (
-                                <div className="flex gap-2 text-xs">
-                                  <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
-                                    Tom: {eventSong.song.musical_key}
-                                  </Badge>
-                                  {eventSong.song.bpm && (
-                                    <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
-                                      {eventSong.song.bpm} BPM
+                                
+                                {/* Informações musicais em destaque */}
+                                <div className="flex flex-wrap gap-2 mt-2">
+                                  {eventSong.song?.musical_key && (
+                                    <Badge variant="secondary" className="bg-primary/15 text-primary border-primary/30 text-sm px-3 py-1 font-semibold">
+                                      🎵 Tom: {eventSong.song.musical_key}
+                                    </Badge>
+                                  )}
+                                  {eventSong.song?.bpm && (
+                                    <Badge variant="secondary" className="bg-primary/15 text-primary border-primary/30 text-sm px-3 py-1 font-semibold">
+                                      ⚡ {eventSong.song.bpm} BPM
+                                    </Badge>
+                                  )}
+                                  {eventSong.song?.category && (
+                                    <Badge variant="outline" className="text-sm px-3 py-1">
+                                      {eventSong.song.category}
                                     </Badge>
                                   )}
                                 </div>
-                              )}
+                              </div>
                             </div>
 
-                            {/* Toggle Chords Button */}
-                            {eventSong.song?.chords && (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => toggleChords(eventSong.id)}
-                                className="w-full flex items-center justify-center gap-2"
-                              >
-                                {expandedChords[eventSong.id] ? (
-                                  <>
-                                    <ChevronUp className="h-4 w-4" />
-                                    Esconder Cifra
-                                  </>
-                                ) : (
-                                  <>
-                                    <ChevronDown className="h-4 w-4" />
-                                    Mostrar Cifra
-                                  </>
-                                )}
-                              </Button>
-                            )}
-
-                            {/* Chords & Lyrics Grid */}
-                            {expandedChords[eventSong.id] && (
-                              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                                {eventSong.song?.chords && (
-                                  <div className="space-y-2">
-                                    <div className="flex items-center gap-2 text-sm font-semibold text-primary">
-                                      <Music className="h-4 w-4" />
-                                      Cifra
+                            {/* Cifras e Letras sempre visíveis */}
+                            <div className="space-y-4">
+                              {eventSong.song?.chords && (
+                                <div className="space-y-3">
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2 text-base font-bold text-primary">
+                                      <Music className="h-5 w-5" />
+                                      Cifra e Acordes
                                     </div>
-                                    <div className="p-4 bg-muted/50 rounded-lg border border-primary/10">
-                                      <pre className="text-sm font-mono whitespace-pre-wrap leading-relaxed">
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => toggleChords(eventSong.id)}
+                                      className="text-xs"
+                                    >
+                                      {expandedChords[eventSong.id] ? (
+                                        <>
+                                          <ChevronUp className="h-4 w-4 mr-1" />
+                                          Recolher
+                                        </>
+                                      ) : (
+                                        <>
+                                          <ChevronDown className="h-4 w-4 mr-1" />
+                                          Expandir
+                                        </>
+                                      )}
+                                    </Button>
+                                  </div>
+                                  
+                                  {expandedChords[eventSong.id] && (
+                                    <div className="p-5 bg-gradient-to-br from-primary/5 to-primary/10 rounded-lg border-2 border-primary/20 shadow-inner">
+                                      <pre className="text-sm font-mono whitespace-pre-wrap leading-relaxed text-foreground">
                                         {eventSong.song.chords}
                                       </pre>
                                     </div>
-                                  </div>
-                                )}
+                                  )}
+                                </div>
+                              )}
 
-                                {eventSong.song?.lyrics && (
-                                  <div className="space-y-2">
-                                    <div className="flex items-center gap-2 text-sm font-semibold text-primary">
-                                      <FileText className="h-4 w-4" />
-                                      Letra
-                                    </div>
-                                    <div className="p-4 bg-muted/30 rounded-lg border border-muted">
-                                      <pre className="text-sm whitespace-pre-wrap leading-relaxed">
-                                        {eventSong.song.lyrics}
-                                      </pre>
-                                    </div>
+                              {eventSong.song?.lyrics && (
+                                <div className="space-y-3">
+                                  <div className="flex items-center gap-2 text-base font-bold text-primary">
+                                    <FileText className="h-5 w-5" />
+                                    Letra
                                   </div>
-                                )}
-                              </div>
-                            )}
+                                  <div className="p-5 bg-muted/40 rounded-lg border border-muted shadow-sm">
+                                    <pre className="text-sm whitespace-pre-wrap leading-relaxed">
+                                      {eventSong.song.lyrics}
+                                    </pre>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </CardContent>
                       </Card>

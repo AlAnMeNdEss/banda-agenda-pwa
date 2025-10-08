@@ -111,9 +111,16 @@ const Dashboard = () => {
             </CardContent>
           </Card>
 
-          {/* Ações baseadas no papel do usuário */}
-          {hasRole('admin') ? <AdminActions /> : <UserActions />}
+          {/* Ações de Visualização */}
+          <UserActions />
         </div>
+
+        {/* Ações Administrativas (apenas para admins) */}
+        {hasRole('admin') && (
+          <div className="mb-8">
+            <AdminActions />
+          </div>
+        )}
 
         {/* Team Info for Admins */}
         {hasRole('admin') && team && (

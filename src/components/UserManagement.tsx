@@ -154,7 +154,7 @@ const UserManagement = () => {
     if (userId === profile?.user_id) {
       toast({
         title: "Erro",
-        description: "Você não pode remover sua própria conta da equipe",
+        description: "Você não pode excluir sua própria conta",
         variant: "destructive",
       });
       return;
@@ -167,7 +167,7 @@ const UserManagement = () => {
     if (userToRemove?.role === 'admin' && adminCount <= 1) {
       toast({
         title: "Erro",
-        description: "Não é possível remover o último administrador da equipe",
+        description: "Não é possível excluir o último administrador da equipe",
         variant: "destructive",
       });
       return;
@@ -176,25 +176,33 @@ const UserManagement = () => {
     try {
       setRemovingUser(userId);
 
-      // Remove team_id from profile (this will prevent access to team data)
+      // Delete from user_roles first (due to foreign key)
+      const { error: roleError } = await supabase
+        .from('user_roles')
+        .delete()
+        .eq('user_id', userId);
+
+      if (roleError) throw roleError;
+
+      // Delete from profiles (this will also trigger cascade delete in auth.users if configured)
       const { error: profileError } = await supabase
         .from('profiles')
-        .update({ team_id: null })
+        .delete()
         .eq('user_id', userId);
 
       if (profileError) throw profileError;
 
       toast({
         title: "Sucesso",
-        description: `${userName} foi removido da equipe`,
+        description: `${userName} foi excluído permanentemente`,
       });
 
       fetchProfiles();
     } catch (error) {
-      console.error('Error removing user from team:', error);
+      console.error('Error deleting user:', error);
       toast({
         title: "Erro",
-        description: "Erro ao remover usuário da equipe",
+        description: "Erro ao excluir usuário",
         variant: "destructive",
       });
     } finally {
@@ -456,16 +464,16 @@ const UserManagement = () => {
                             disabled={removingUser === profile.user_id}
                             className="hover:bg-destructive hover:text-destructive-foreground"
                           >
-                            <UserX className="h-3 w-3 mr-1" />
-                            Remover
+                            <Trash2 className="h-3 w-3 mr-1" />
+                            Excluir
                           </Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
-                            <AlertDialogTitle>Remover da Equipe</AlertDialogTitle>
+                            <AlertDialogTitle>Excluir Usuário</AlertDialogTitle>
                             <AlertDialogDescription>
-                              Tem certeza que deseja remover <strong>{profile.display_name}</strong> da equipe? 
-                              O usuário perderá acesso aos dados da equipe, mas a conta permanecerá ativa.
+                              Tem certeza que deseja excluir <strong>{profile.display_name}</strong>? 
+                              Esta ação é <strong>permanente</strong> e todos os dados do usuário serão removidos do sistema.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
@@ -474,7 +482,7 @@ const UserManagement = () => {
                               onClick={() => handleRemoveFromTeam(profile.user_id, profile.display_name)}
                               className="bg-destructive hover:bg-destructive/90"
                             >
-                              Remover da Equipe
+                              Excluir Permanentemente
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>

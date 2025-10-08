@@ -86,7 +86,8 @@ const EventForm = ({ children, event, onOpenChange }: EventFormProps) => {
         attachments: event.attachments ? JSON.parse(event.attachments) : [],
       });
     }
-  }, [event, open, form]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [event, open]);
 
   const onSubmit = async (data: EventFormData) => {
     try {

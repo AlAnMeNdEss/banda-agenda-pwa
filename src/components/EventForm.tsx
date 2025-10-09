@@ -158,16 +158,16 @@ const EventForm = ({ children, event, onOpenChange }: EventFormProps) => {
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-hidden flex flex-col">
-        <DialogHeader className="pb-4 border-b">
+      <DialogContent className="sm:max-w-[800px] max-h-[90vh] flex flex-col p-0">
+        <DialogHeader className="pb-4 border-b px-6 pt-6 shrink-0">
           <DialogTitle className="text-2xl font-bold bg-gradient-celestial bg-clip-text text-transparent">
             {isEditing ? "✏️ Editar Evento" : "✨ Novo Evento"}
           </DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col h-full">
-            <Tabs defaultValue="basic" className="w-full flex-1 overflow-hidden flex flex-col">
-              <TabsList className="grid w-full grid-cols-4 h-auto p-1 bg-muted/30">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col flex-1 min-h-0">
+            <Tabs defaultValue="basic" className="w-full flex-1 flex flex-col min-h-0">
+              <TabsList className="grid w-full grid-cols-4 h-auto p-1 bg-muted/30 mx-6 mt-4 shrink-0">
                 <TabsTrigger value="basic" className="data-[state=active]:bg-gradient-celestial data-[state=active]:text-white">
                   <Calendar className="h-4 w-4 mr-2" />
                   Básico
@@ -186,7 +186,9 @@ const EventForm = ({ children, event, onOpenChange }: EventFormProps) => {
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="basic" className="space-y-4 overflow-y-auto flex-1 pr-2">
+              <div className="flex-1 min-h-0 overflow-hidden">
+                <div className="h-full overflow-y-auto px-6 pb-4">
+              <TabsContent value="basic" className="space-y-4 mt-4">
                 <div className="space-y-4 animate-fade-in">
                   <FormField
                     control={form.control}
@@ -348,7 +350,7 @@ const EventForm = ({ children, event, onOpenChange }: EventFormProps) => {
                 />
               </TabsContent>
 
-              <TabsContent value="participants" className="space-y-4">
+              <TabsContent value="participants" className="space-y-4 mt-4">
                 <FormField
                   control={form.control}
                   name="participants"
@@ -364,7 +366,7 @@ const EventForm = ({ children, event, onOpenChange }: EventFormProps) => {
                 />
               </TabsContent>
 
-              <TabsContent value="songs" className="space-y-4">
+              <TabsContent value="songs" className="space-y-4 mt-4">
                 <FormField
                   control={form.control}
                   name="songs"
@@ -380,7 +382,7 @@ const EventForm = ({ children, event, onOpenChange }: EventFormProps) => {
                 />
               </TabsContent>
 
-              <TabsContent value="attachments" className="space-y-4">
+              <TabsContent value="attachments" className="space-y-4 mt-4">
                 <FormField
                   control={form.control}
                   name="attachments"
@@ -441,9 +443,11 @@ const EventForm = ({ children, event, onOpenChange }: EventFormProps) => {
                   )}
                 />
               </TabsContent>
+                </div>
+              </div>
             </Tabs>
 
-            <div className="flex justify-end gap-3 pt-4 border-t mt-4">
+            <div className="flex justify-end gap-3 pt-4 border-t px-6 pb-6 shrink-0">
               <Button 
                 type="button" 
                 variant="outline" 

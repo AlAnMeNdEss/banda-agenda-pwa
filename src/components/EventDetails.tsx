@@ -12,6 +12,8 @@ import { useEventSongs } from "@/hooks/useEventSongs";
 import { useEventParticipants } from "@/hooks/useEventParticipants";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import ChordTransposer from "@/components/ChordTransposer";
+import Metronome from "@/components/Metronome";
 
 interface EventDetailsProps {
   event: Event | null;
@@ -23,6 +25,8 @@ const EventDetails = ({ event, open, onOpenChange }: EventDetailsProps) => {
   const { data: eventSongs = [] } = useEventSongs(event?.id || '');
   const { data: participants = [] } = useEventParticipants(event?.id || '');
   const [activeTab, setActiveTab] = useState("info");
+  const [transposedChords, setTransposedChords] = useState<Record<string, string>>({});
+  const [transposedLyrics, setTransposedLyrics] = useState<Record<string, string>>({});
 
   if (!event) return null;
 
@@ -78,7 +82,7 @@ const EventDetails = ({ event, open, onOpenChange }: EventDetailsProps) => {
         </DialogHeader>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden min-h-0">
-          <TabsList className="mx-6 mt-4 grid w-auto grid-cols-3 gap-2 shrink-0">
+          <TabsList className="mx-6 mt-4 grid w-auto grid-cols-4 gap-2 shrink-0">
             <TabsTrigger value="info" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <FileText className="h-4 w-4 mr-2" />
               Informações
@@ -90,6 +94,10 @@ const EventDetails = ({ event, open, onOpenChange }: EventDetailsProps) => {
             <TabsTrigger value="equipe" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <Users className="h-4 w-4 mr-2" />
               Equipe ({participants.length})
+            </TabsTrigger>
+            <TabsTrigger value="metronomo" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+              <Clock className="h-4 w-4 mr-2" />
+              Metrônomo
             </TabsTrigger>
           </TabsList>
 
@@ -214,6 +222,23 @@ const EventDetails = ({ event, open, onOpenChange }: EventDetailsProps) => {
                         </div>
                       )}
 
+                      {/* Transpositor de Acordes */}
+                      {(eventSong.song?.chords || eventSong.song?.lyrics) && (
+                        <ChordTransposer
+                          originalKey={eventSong.song?.musical_key}
+                          chords={eventSong.song?.chords || eventSong.song?.lyrics}
+                          onTranspose={(transposed, semitones) => {
+                            const songId = eventSong.id;
+                            if (eventSong.song?.chords) {
+                              setTransposedChords(prev => ({ ...prev, [songId]: transposed }));
+                            }
+                            if (eventSong.song?.lyrics) {
+                              setTransposedLyrics(prev => ({ ...prev, [songId]: transposed }));
+                            }
+                          }}
+                        />
+                      )}
+
                       {/* Cifras */}
                       {eventSong.song?.chords && (
                         <div className="space-y-3">
@@ -223,7 +248,7 @@ const EventDetails = ({ event, open, onOpenChange }: EventDetailsProps) => {
                           </h4>
                           <div className="p-6 bg-muted/50 rounded-lg border-2 border-primary/10">
                             <pre className="font-mono text-base whitespace-pre-wrap leading-loose tracking-wide">
-                              {eventSong.song.chords}
+                              {transposedChords[eventSong.id] || eventSong.song.chords}
                             </pre>
                           </div>
                         </div>
@@ -238,7 +263,7 @@ const EventDetails = ({ event, open, onOpenChange }: EventDetailsProps) => {
                           </h4>
                           <div className="p-6 bg-accent/20 rounded-lg border">
                             <pre className="text-base whitespace-pre-wrap leading-loose">
-                              {eventSong.song.lyrics}
+                              {transposedLyrics[eventSong.id] || eventSong.song.lyrics}
                             </pre>
                           </div>
                         </div>
@@ -293,6 +318,13 @@ const EventDetails = ({ event, open, onOpenChange }: EventDetailsProps) => {
                   ))}
                 </div>
               )}
+            </TabsContent>
+
+            {/* Tab: Metrônomo */}
+            <TabsContent value="metronomo" className="mt-6">
+              <div className="max-w-md mx-auto">
+                <Metronome defaultBpm={eventSongs[0]?.song?.bpm} />
+              </div>
             </TabsContent>
             </ScrollArea>
           </div>

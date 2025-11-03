@@ -1,6 +1,6 @@
 import { LogOut, User, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,10 +10,14 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useAuth } from '@/contexts/AuthContext';
+import AvatarUpload from './AvatarUpload';
+import { useState } from 'react';
 
 const UserProfile = () => {
   const { user, profile, signOut } = useAuth();
+  const [profileDialogOpen, setProfileDialogOpen] = useState(false);
 
   if (!user || !profile) return null;
 
@@ -57,16 +61,20 @@ const UserProfile = () => {
   };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-          <Avatar className="h-10 w-10">
-            <AvatarFallback className="bg-primary text-primary-foreground">
-              {getInitials(profile.display_name || user.email || 'U')}
-            </AvatarFallback>
-          </Avatar>
-        </Button>
-      </DropdownMenuTrigger>
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+            <Avatar className="h-10 w-10">
+              {profile.avatar_url && (
+                <AvatarImage src={profile.avatar_url} alt={profile.display_name || 'Avatar'} />
+              )}
+              <AvatarFallback className="bg-primary text-primary-foreground">
+                {getInitials(profile.display_name || user.email || 'U')}
+              </AvatarFallback>
+            </Avatar>
+          </Button>
+        </DropdownMenuTrigger>
       
       <DropdownMenuContent className="w-80" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
@@ -92,9 +100,12 @@ const UserProfile = () => {
         
         <DropdownMenuSeparator />
         
-        <DropdownMenuItem className="cursor-pointer">
+        <DropdownMenuItem 
+          className="cursor-pointer"
+          onClick={() => setProfileDialogOpen(true)}
+        >
           <User className="mr-2 h-4 w-4" />
-          <span>Perfil</span>
+          <span>Editar Perfil</span>
         </DropdownMenuItem>
         
         <DropdownMenuItem className="cursor-pointer">
@@ -113,6 +124,20 @@ const UserProfile = () => {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+
+    <Dialog open={profileDialogOpen} onOpenChange={setProfileDialogOpen}>
+      <DialogContent className="max-w-[90vw] sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Editar Foto de Perfil</DialogTitle>
+        </DialogHeader>
+        <AvatarUpload
+          avatarUrl={profile.avatar_url}
+          displayName={profile.display_name || user.email || 'Usuário'}
+          onUploadComplete={() => setProfileDialogOpen(false)}
+        />
+      </DialogContent>
+    </Dialog>
+    </>
   );
 };
 

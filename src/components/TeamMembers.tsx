@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Users, User } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -12,6 +13,7 @@ interface Profile {
   role: 'admin' | 'leader' | 'musician' | 'member';
   ministry_function?: string;
   phone?: string;
+  avatar_url?: string;
 }
 
 const TeamMembers = () => {
@@ -31,7 +33,7 @@ const TeamMembers = () => {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, user_id, display_name, role, ministry_function, phone')
+        .select('id, user_id, display_name, role, ministry_function, phone, avatar_url')
         .eq('team_id', profile.team_id)
         .order('role', { ascending: true })
         .order('display_name', { ascending: true });
@@ -65,6 +67,15 @@ const TeamMembers = () => {
     }
   };
 
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
   if (loading) {
     return (
       <Card className="shadow-gentle">
@@ -96,9 +107,14 @@ const TeamMembers = () => {
           {profiles.map((member) => (
             <div key={member.id} className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 rounded-lg bg-muted/50">
               <div className="flex items-center gap-3 flex-1 min-w-0">
-                <div className="p-2 bg-primary/10 rounded-lg flex-shrink-0">
-                  <User className="h-5 w-5 text-primary" />
-                </div>
+                <Avatar className="h-12 w-12 flex-shrink-0">
+                  {member.avatar_url && (
+                    <AvatarImage src={member.avatar_url} alt={member.display_name} />
+                  )}
+                  <AvatarFallback className="bg-primary text-primary-foreground">
+                    {getInitials(member.display_name)}
+                  </AvatarFallback>
+                </Avatar>
                 <div className="flex-1 min-w-0">
                   <h4 className="font-medium truncate">{member.display_name}</h4>
                   {member.ministry_function && (

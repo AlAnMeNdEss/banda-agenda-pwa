@@ -10,6 +10,7 @@ interface Profile {
   ministry_function?: string;
   phone?: string;
   team_id?: string;
+  avatar_url?: string;
 }
 
 interface AuthContextType {

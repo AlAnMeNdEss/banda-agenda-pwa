@@ -185,6 +185,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          avatar_url: string | null
           created_at: string
           display_name: string | null
           id: string
@@ -196,6 +197,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          avatar_url?: string | null
           created_at?: string
           display_name?: string | null
           id?: string
@@ -207,6 +209,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          avatar_url?: string | null
           created_at?: string
           display_name?: string | null
           id?: string
@@ -333,22 +336,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      generate_team_code: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      get_current_user_team_id: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
+      generate_team_code: { Args: never; Returns: string }
+      get_current_user_team_id: { Args: never; Returns: string }
       get_user_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
       }
-      has_admin_user: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
+      has_admin_user: { Args: never; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

@@ -3,6 +3,7 @@ import { Plus, Mail, Trash2, Edit3, UserPlus, Phone, Calendar, Shield, UserX, Mu
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -23,6 +24,7 @@ interface Profile {
   phone?: string;
   created_at: string;
   team_id?: string;
+  avatar_url?: string;
 }
 
 const UserManagement = () => {
@@ -279,6 +281,15 @@ const UserManagement = () => {
     }
   };
 
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
   if (loading) {
     return (
       <Card className="shadow-gentle">
@@ -393,14 +404,23 @@ const UserManagement = () => {
               <CardContent className="p-4">
                 <div className="flex flex-col gap-4">
                   {/* Header com nome e badge */}
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                    <div className="flex items-center gap-2">
-                      <Shield className="h-4 w-4 text-primary flex-shrink-0" />
-                      <h4 className="font-semibold text-lg break-words">{profile.display_name}</h4>
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-12 w-12 flex-shrink-0">
+                        {profile.avatar_url && (
+                          <AvatarImage src={profile.avatar_url} alt={profile.display_name} />
+                        )}
+                        <AvatarFallback className="bg-primary text-primary-foreground">
+                          {getInitials(profile.display_name)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                        <h4 className="font-semibold text-lg break-words">{profile.display_name}</h4>
+                        <Badge variant={getRoleBadgeVariant(profile.role)} className="w-fit">
+                          {getRoleLabel(profile.role)}
+                        </Badge>
+                      </div>
                     </div>
-                    <Badge variant={getRoleBadgeVariant(profile.role)} className="w-fit">
-                      {getRoleLabel(profile.role)}
-                    </Badge>
                   </div>
 
                   {/* Informações detalhadas */}

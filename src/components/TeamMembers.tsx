@@ -87,24 +87,29 @@ const TeamMembers = () => {
     <Card className="shadow-gentle">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Users className="h-5 w-5 text-primary" />
-          Membros da Equipe ({profiles.length})
+          <Users className="h-5 w-5 text-primary flex-shrink-0" />
+          <span className="truncate">Membros da Equipe ({profiles.length})</span>
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
+        <div className="space-y-3">
           {profiles.map((member) => (
-            <div key={member.id} className="flex items-center gap-4 p-3 rounded-lg bg-muted/50">
-              <div className="p-2 bg-primary/10 rounded-lg">
-                <User className="h-5 w-5 text-primary" />
+            <div key={member.id} className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 rounded-lg bg-muted/50">
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                <div className="p-2 bg-primary/10 rounded-lg flex-shrink-0">
+                  <User className="h-5 w-5 text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-medium truncate">{member.display_name}</h4>
+                  {member.ministry_function && (
+                    <p className="text-sm text-muted-foreground truncate">{member.ministry_function}</p>
+                  )}
+                  {member.phone && (
+                    <p className="text-xs text-muted-foreground truncate">{member.phone}</p>
+                  )}
+                </div>
               </div>
-              <div className="flex-1">
-                <h4 className="font-medium">{member.display_name}</h4>
-                {member.ministry_function && (
-                  <p className="text-sm text-muted-foreground">{member.ministry_function}</p>
-                )}
-              </div>
-              <Badge variant={getRoleBadgeVariant(member.role)}>
+              <Badge variant={getRoleBadgeVariant(member.role)} className="w-fit">
                 {getRoleLabel(member.role)}
               </Badge>
             </div>

@@ -297,19 +297,19 @@ const UserManagement = () => {
   return (
     <Card className="shadow-gentle">
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <CardTitle className="flex items-center gap-2">
-            <UserPlus className="h-5 w-5 text-primary" />
-            Gerenciar Usuários
+            <UserPlus className="h-5 w-5 text-primary flex-shrink-0" />
+            <span className="truncate">Gerenciar Usuários</span>
           </CardTitle>
           <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-gradient-celestial hover:shadow-celestial">
+              <Button className="bg-gradient-celestial hover:shadow-celestial w-full sm:w-auto">
                 <Plus className="h-4 w-4 mr-2" />
                 Convidar Usuário
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="max-w-[90vw] sm:max-w-md max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Convidar Novo Usuário</DialogTitle>
               </DialogHeader>
@@ -367,7 +367,7 @@ const UserManagement = () => {
                     placeholder="(11) 99999-9999"
                   />
                 </div>
-                <div className="flex gap-2 pt-4">
+                <div className="flex flex-col sm:flex-row gap-2 pt-4">
                   <Button type="submit" className="flex-1">
                     <Mail className="h-4 w-4 mr-2" />
                     Enviar Convite
@@ -376,6 +376,7 @@ const UserManagement = () => {
                     type="button" 
                     variant="outline" 
                     onClick={() => setInviteDialogOpen(false)}
+                    className="sm:w-auto"
                   >
                     Cancelar
                   </Button>
@@ -390,70 +391,68 @@ const UserManagement = () => {
           {profiles.map((profile) => (
             <Card key={profile.id} className="hover:shadow-gentle transition-shadow">
               <CardContent className="p-4">
-                <div className="flex items-start gap-4">
-                  <div className="flex-1 space-y-3">
-                    {/* Header com nome e badge */}
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-2">
-                        <Shield className="h-4 w-4 text-primary" />
-                        <h4 className="font-semibold text-lg">{profile.display_name}</h4>
-                      </div>
-                      <Badge variant={getRoleBadgeVariant(profile.role)}>
-                        {getRoleLabel(profile.role)}
-                      </Badge>
+                <div className="flex flex-col gap-4">
+                  {/* Header com nome e badge */}
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                    <div className="flex items-center gap-2">
+                      <Shield className="h-4 w-4 text-primary flex-shrink-0" />
+                      <h4 className="font-semibold text-lg break-words">{profile.display_name}</h4>
                     </div>
+                    <Badge variant={getRoleBadgeVariant(profile.role)} className="w-fit">
+                      {getRoleLabel(profile.role)}
+                    </Badge>
+                  </div>
 
-                    {/* Informações detalhadas */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
-                      {profile.ministry_function && (
-                        <div className="flex items-center gap-2 text-muted-foreground">
-                          <Music className="h-3 w-3 text-primary" />
-                          <span className="font-medium">{profile.ministry_function}</span>
-                        </div>
-                      )}
-                      {profile.phone && (
-                        <div className="flex items-center gap-2 text-muted-foreground">
-                          <Phone className="h-3 w-3" />
-                          <span>{profile.phone}</span>
-                        </div>
-                      )}
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <Calendar className="h-3 w-3" />
-                        <span>Membro desde {new Date(profile.created_at).toLocaleDateString('pt-BR')}</span>
+                  {/* Informações detalhadas */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+                    {profile.ministry_function && (
+                      <div className="flex items-center gap-2 text-muted-foreground min-w-0">
+                        <Music className="h-3 w-3 text-primary flex-shrink-0" />
+                        <span className="font-medium truncate">{profile.ministry_function}</span>
                       </div>
+                    )}
+                    {profile.phone && (
+                      <div className="flex items-center gap-2 text-muted-foreground min-w-0">
+                        <Phone className="h-3 w-3 flex-shrink-0" />
+                        <span className="truncate">{profile.phone}</span>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2 text-muted-foreground sm:col-span-2 min-w-0">
+                      <Calendar className="h-3 w-3 flex-shrink-0" />
+                      <span className="truncate">Membro desde {new Date(profile.created_at).toLocaleDateString('pt-BR')}</span>
                     </div>
                   </div>
 
+                  <Separator />
+
                   {/* Ações */}
                   <div className="flex flex-col gap-2">
-                    <div className="flex gap-2">
-                      <Select 
-                        value={profile.role} 
-                        onValueChange={(value: 'admin' | 'leader' | 'musician' | 'member') => 
-                          handleUpdateRole(profile.user_id, value)
-                        }
-                      >
-                        <SelectTrigger className="w-36">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="member">Membro</SelectItem>
-                          <SelectItem value="musician">Músico</SelectItem>
-                          <SelectItem value="leader">Líder</SelectItem>
-                          <SelectItem value="admin">Administrador</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+                    <Select 
+                      value={profile.role} 
+                      onValueChange={(value: 'admin' | 'leader' | 'musician' | 'member') => 
+                        handleUpdateRole(profile.user_id, value)
+                      }
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="member">Membro</SelectItem>
+                        <SelectItem value="musician">Músico</SelectItem>
+                        <SelectItem value="leader">Líder</SelectItem>
+                        <SelectItem value="admin">Administrador</SelectItem>
+                      </SelectContent>
+                    </Select>
 
-                    <div className="flex gap-1">
+                    <div className="flex gap-2">
                       <Button 
                         variant="outline" 
                         size="sm"
                         onClick={() => handleEditProfile(profile)}
                         className="flex-1"
                       >
-                        <Edit3 className="h-3 w-3 mr-1" />
-                        Editar
+                        <Edit3 className="h-3 w-3 sm:mr-1" />
+                        <span className="hidden sm:inline">Editar</span>
                       </Button>
                       
                       <AlertDialog>
@@ -462,13 +461,13 @@ const UserManagement = () => {
                             variant="outline" 
                             size="sm"
                             disabled={removingUser === profile.user_id}
-                            className="hover:bg-destructive hover:text-destructive-foreground"
+                            className="hover:bg-destructive hover:text-destructive-foreground flex-1"
                           >
-                            <Trash2 className="h-3 w-3 mr-1" />
-                            Excluir
+                            <Trash2 className="h-3 w-3 sm:mr-1" />
+                            <span className="hidden sm:inline">Excluir</span>
                           </Button>
                         </AlertDialogTrigger>
-                        <AlertDialogContent>
+                        <AlertDialogContent className="max-w-[90vw] sm:max-w-md">
                           <AlertDialogHeader>
                             <AlertDialogTitle>Excluir Usuário</AlertDialogTitle>
                             <AlertDialogDescription>
@@ -476,13 +475,14 @@ const UserManagement = () => {
                               Esta ação é <strong>permanente</strong> e todos os dados do usuário serão removidos do sistema.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                          <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+                            <AlertDialogCancel className="w-full sm:w-auto">Cancelar</AlertDialogCancel>
                             <AlertDialogAction
                               onClick={() => handleRemoveFromTeam(profile.user_id, profile.display_name)}
-                              className="bg-destructive hover:bg-destructive/90"
+                              className="bg-destructive hover:bg-destructive/90 w-full sm:w-auto"
                             >
-                              Excluir Permanentemente
+                              <UserX className="h-4 w-4 mr-2" />
+                              Excluir
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
@@ -505,9 +505,9 @@ const UserManagement = () => {
 
         {/* Dialog de Edição */}
         <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-          <DialogContent>
+          <DialogContent className="max-w-[90vw] sm:max-w-md max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Editar Perfil - {selectedProfile?.display_name}</DialogTitle>
+              <DialogTitle className="break-words">Editar Perfil - {selectedProfile?.display_name}</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleUpdateProfile} className="space-y-4">
               <div>
@@ -538,7 +538,7 @@ const UserManagement = () => {
                   placeholder="(11) 99999-9999"
                 />
               </div>
-              <div className="flex gap-2 pt-4">
+              <div className="flex flex-col sm:flex-row gap-2 pt-4">
                 <Button type="submit" className="flex-1">
                   <Edit3 className="h-4 w-4 mr-2" />
                   Salvar Alterações
@@ -547,6 +547,7 @@ const UserManagement = () => {
                   type="button" 
                   variant="outline" 
                   onClick={() => setEditDialogOpen(false)}
+                  className="sm:w-auto"
                 >
                   Cancelar
                 </Button>

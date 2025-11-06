@@ -36,17 +36,18 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-worship">
       {/* Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-celestial">
+      <div className="relative overflow-hidden">
         <img 
           src={team?.banner_url || worshipHero} 
           alt="Worship background" 
-          className="absolute inset-0 w-full h-full object-cover opacity-20"
+          className="absolute inset-0 w-full h-full object-cover"
         />
+        <div className="absolute inset-0 bg-black/40" />
         <div className="relative px-6 py-20 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold text-primary-foreground mb-4">
+          <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg">
             Ministério de Louvor
           </h1>
-          <p className="text-xl text-primary-foreground/90 max-w-2xl mx-auto">
+          <p className="text-xl text-white/95 max-w-2xl mx-auto drop-shadow-md">
             Gerenciamento completo da agenda e repertório do seu ministério
           </p>
         </div>
@@ -112,8 +113,8 @@ const Dashboard = () => {
             </CardContent>
           </Card>
 
-          {/* Ações de Visualização */}
-          <UserActions />
+          {/* Ações de Visualização (apenas para membros não-admin) */}
+          {!hasRole('admin') && <UserActions />}
         </div>
 
         {/* Ações Administrativas (apenas para admins) */}

@@ -9,6 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useTeam } from "@/hooks/useTeam";
 import AdminActions from "@/components/AdminActions";
 import UserActions from "@/components/UserActions";
+import TeamBannerUpload from "@/components/TeamBannerUpload";
 
 const Dashboard = () => {
   const { data: events = [] } = useEvents();
@@ -37,7 +38,7 @@ const Dashboard = () => {
       {/* Hero Section */}
       <div className="relative overflow-hidden bg-gradient-celestial">
         <img 
-          src={worshipHero} 
+          src={team?.banner_url || worshipHero} 
           alt="Worship background" 
           className="absolute inset-0 w-full h-full object-cover opacity-20"
         />
@@ -125,10 +126,18 @@ const Dashboard = () => {
         {/* Team Info for Admins */}
         {hasRole('admin') && team && (
           <div className="bg-gradient-celestial rounded-lg p-6 text-white mb-8">
-            <h2 className="text-xl font-bold mb-2">Informações da Equipe</h2>
-            <p className="text-white/90 mb-2">Equipe: {team.name}</p>
-            <p className="text-white/90 mb-4">Código da Equipe: <span className="font-bold tracking-widest">{team.team_code}</span></p>
-            <p className="text-sm text-white/80">Compartilhe o código acima para outros membros entrarem na equipe.</p>
+            <h2 className="text-xl font-bold mb-4">Informações da Equipe</h2>
+            <div className="space-y-4">
+              <div>
+                <p className="text-white/90 mb-2">Equipe: {team.name}</p>
+                <p className="text-white/90 mb-4">Código da Equipe: <span className="font-bold tracking-widest">{team.team_code}</span></p>
+                <p className="text-sm text-white/80 mb-4">Compartilhe o código acima para outros membros entrarem na equipe.</p>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold mb-2">Banner da Equipe</h3>
+                <TeamBannerUpload />
+              </div>
+            </div>
           </div>
         )}
       </div>

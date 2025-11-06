@@ -9,6 +9,7 @@ export interface Team {
   created_by: string;
   created_at: string;
   updated_at: string;
+  banner_url: string | null;
 }
 
 export const useTeam = () => {

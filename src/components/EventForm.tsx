@@ -158,51 +158,72 @@ const EventForm = ({ children, event, onOpenChange }: EventFormProps) => {
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[800px] max-h-[90vh] flex flex-col p-0">
-        <DialogHeader className="pb-4 border-b px-6 pt-6 shrink-0">
-          <DialogTitle className="text-2xl font-bold bg-gradient-celestial bg-clip-text text-transparent">
-            {isEditing ? "✏️ Editar Evento" : "✨ Novo Evento"}
-          </DialogTitle>
+      <DialogContent className="sm:max-w-[900px] max-h-[90vh] flex flex-col p-0 gap-0">
+        <DialogHeader className="px-8 pt-8 pb-6 bg-gradient-to-br from-primary/5 via-primary/5 to-transparent border-b shrink-0">
+          <div className="space-y-2">
+            <DialogTitle className="text-3xl font-bold text-foreground">
+              {isEditing ? "Editar Evento" : "Criar Novo Evento"}
+            </DialogTitle>
+            <p className="text-muted-foreground">
+              {isEditing ? "Atualize as informações do evento" : "Preencha os detalhes e organize seu evento"}
+            </p>
+          </div>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col flex-1 min-h-0">
             <Tabs defaultValue="basic" className="w-full flex-1 flex flex-col min-h-0">
-              <TabsList className="grid w-full grid-cols-4 h-auto p-1 bg-muted/30 mx-6 mt-4 shrink-0">
-                <TabsTrigger value="basic" className="data-[state=active]:bg-gradient-celestial data-[state=active]:text-white">
-                  <Calendar className="h-4 w-4 mr-2" />
-                  Básico
+              <TabsList className="grid w-full grid-cols-4 h-auto p-1.5 gap-1 bg-muted/50 mx-8 mt-6 rounded-lg shrink-0">
+                <TabsTrigger 
+                  value="basic" 
+                  className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-all"
+                >
+                  <Calendar className="h-4 w-4" />
+                  <span className="hidden sm:inline">Informações</span>
+                  <span className="sm:hidden">Info</span>
                 </TabsTrigger>
-                <TabsTrigger value="participants" className="data-[state=active]:bg-gradient-celestial data-[state=active]:text-white">
-                  <Users className="h-4 w-4 mr-2" />
-                  Participantes
+                <TabsTrigger 
+                  value="participants" 
+                  className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-all"
+                >
+                  <Users className="h-4 w-4" />
+                  <span className="hidden sm:inline">Equipe</span>
+                  <span className="sm:hidden">Equipe</span>
                 </TabsTrigger>
-                <TabsTrigger value="songs" className="data-[state=active]:bg-gradient-celestial data-[state=active]:text-white">
-                  <Music className="h-4 w-4 mr-2" />
-                  Repertório
+                <TabsTrigger 
+                  value="songs" 
+                  className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-all"
+                >
+                  <Music className="h-4 w-4" />
+                  <span className="hidden sm:inline">Músicas</span>
+                  <span className="sm:hidden">Músicas</span>
                 </TabsTrigger>
-                <TabsTrigger value="attachments" className="data-[state=active]:bg-gradient-celestial data-[state=active]:text-white">
-                  <Paperclip className="h-4 w-4 mr-2" />
-                  Anexos
+                <TabsTrigger 
+                  value="attachments" 
+                  className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-all"
+                >
+                  <Paperclip className="h-4 w-4" />
+                  <span className="hidden sm:inline">Materiais</span>
+                  <span className="sm:hidden">Links</span>
                 </TabsTrigger>
               </TabsList>
 
               <div className="flex-1 min-h-0 overflow-hidden">
-                <div className="h-full overflow-y-auto px-6 pb-4">
-              <TabsContent value="basic" className="space-y-4 mt-4">
-                <div className="space-y-4 animate-fade-in">
+                <div className="h-full overflow-y-auto px-8 pb-6">
+              <TabsContent value="basic" className="space-y-6 mt-6">
+                <div className="space-y-5 animate-fade-in">
                   <FormField
                     control={form.control}
                     name="title"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="flex items-center gap-2 text-base">
+                        <FormLabel className="flex items-center gap-2 text-base font-semibold">
                           <FileText className="h-4 w-4 text-primary" />
                           Título do Evento
                         </FormLabel>
                         <FormControl>
                           <Input 
-                            placeholder="Ex: Ensaio de Louvor, Culto da Família" 
-                            className="h-11"
+                            placeholder="Ex: Culto de Celebração, Ensaio Geral" 
+                            className="h-12 text-base"
                             {...field} 
                           />
                         </FormControl>
@@ -216,14 +237,14 @@ const EventForm = ({ children, event, onOpenChange }: EventFormProps) => {
                     name="description"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="flex items-center gap-2 text-base">
+                        <FormLabel className="flex items-center gap-2 text-base font-semibold">
                           <FileText className="h-4 w-4 text-primary" />
                           Descrição
                         </FormLabel>
                         <FormControl>
                           <Textarea 
-                            placeholder="Descreva o evento (opcional)" 
-                            className="resize-none min-h-[80px]" 
+                            placeholder="Descrição breve do evento (opcional)" 
+                            className="resize-none min-h-[90px] text-base" 
                             rows={3}
                             {...field} 
                           />
@@ -234,18 +255,18 @@ const EventForm = ({ children, event, onOpenChange }: EventFormProps) => {
                   />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                   <FormField
                     control={form.control}
                     name="event_date"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="flex items-center gap-2">
+                        <FormLabel className="flex items-center gap-2 font-semibold">
                           <Calendar className="h-4 w-4 text-primary" />
                           Data
                         </FormLabel>
                         <FormControl>
-                          <Input type="date" className="h-11" {...field} />
+                          <Input type="date" className="h-12 text-base" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -257,12 +278,12 @@ const EventForm = ({ children, event, onOpenChange }: EventFormProps) => {
                     name="event_time"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="flex items-center gap-2">
+                        <FormLabel className="flex items-center gap-2 font-semibold">
                           <Clock className="h-4 w-4 text-primary" />
                           Início
                         </FormLabel>
                         <FormControl>
-                          <Input type="time" className="h-11" {...field} />
+                          <Input type="time" className="h-12 text-base" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -274,12 +295,57 @@ const EventForm = ({ children, event, onOpenChange }: EventFormProps) => {
                     name="end_time"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="flex items-center gap-2">
-                          <Clock className="h-4 w-4 text-muted-foreground" />
+                        <FormLabel className="flex items-center gap-2 font-semibold">
+                          <Clock className="h-4 w-4 text-primary" />
                           Término
                         </FormLabel>
                         <FormControl>
-                          <Input type="time" className="h-11" {...field} />
+                          <Input type="time" className="h-12 text-base" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <FormField
+                    control={form.control}
+                    name="event_type"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="font-semibold">Tipo de Evento</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="h-12 text-base">
+                              <SelectValue placeholder="Selecione o tipo" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="evento">🎵 Evento</SelectItem>
+                            <SelectItem value="ensaio">🎹 Ensaio</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="location"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="flex items-center gap-2 font-semibold">
+                          <MapPin className="h-4 w-4 text-primary" />
+                          Local
+                        </FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="Ex: Igreja Principal, Sala 2" 
+                            className="h-12 text-base"
+                            {...field} 
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -289,57 +355,14 @@ const EventForm = ({ children, event, onOpenChange }: EventFormProps) => {
 
                 <FormField
                   control={form.control}
-                  name="event_type"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Tipo de Evento</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecione o tipo" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="evento">Evento</SelectItem>
-                          <SelectItem value="ensaio">Ensaio</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="location"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-2 text-base">
-                        <MapPin className="h-4 w-4 text-primary" />
-                        Local
-                      </FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="Igreja, casa de membro, estúdio, online..." 
-                          className="h-11"
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
                   name="notes"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Observações</FormLabel>
+                      <FormLabel className="font-semibold">Observações Importantes</FormLabel>
                       <FormControl>
                         <Textarea 
-                          placeholder="Detalhes importantes: trazer instrumentos, repertório será definido antes..." 
-                          className="resize-none" 
+                          placeholder="Informações adicionais sobre o evento..." 
+                          className="resize-none min-h-[90px] text-base" 
                           rows={3}
                           {...field} 
                         />
@@ -350,7 +373,7 @@ const EventForm = ({ children, event, onOpenChange }: EventFormProps) => {
                 />
               </TabsContent>
 
-              <TabsContent value="participants" className="space-y-4 mt-4">
+              <TabsContent value="participants" className="space-y-6 mt-6">
                 <FormField
                   control={form.control}
                   name="participants"
@@ -366,7 +389,7 @@ const EventForm = ({ children, event, onOpenChange }: EventFormProps) => {
                 />
               </TabsContent>
 
-              <TabsContent value="songs" className="space-y-4 mt-4">
+              <TabsContent value="songs" className="space-y-6 mt-6">
                 <FormField
                   control={form.control}
                   name="songs"
@@ -382,49 +405,53 @@ const EventForm = ({ children, event, onOpenChange }: EventFormProps) => {
                 />
               </TabsContent>
 
-              <TabsContent value="attachments" className="space-y-4 mt-4">
+              <TabsContent value="attachments" className="space-y-6 mt-6">
                 <FormField
                   control={form.control}
                   name="attachments"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Anexos e Links</FormLabel>
+                      <FormLabel className="text-base font-semibold">Links e Materiais de Apoio</FormLabel>
                       <FormControl>
-                        <div className="space-y-2">
-                          <Input 
-                            placeholder="Cole aqui links para PDFs, playlists, slides..." 
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter') {
-                                e.preventDefault();
-                                const input = e.target as HTMLInputElement;
-                                const url = input.value.trim();
-                                if (url) {
-                                  const newAttachment = {
-                                    name: url.split('/').pop() || 'Link',
-                                    url: url,
-                                    type: 'link'
-                                  };
-                                  field.onChange([...field.value, newAttachment]);
-                                  input.value = '';
+                        <div className="space-y-4">
+                          <div className="space-y-2">
+                            <Input 
+                              placeholder="Cole o link aqui (YouTube, Google Drive, etc.)" 
+                              className="h-12 text-base"
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  e.preventDefault();
+                                  const input = e.target as HTMLInputElement;
+                                  const url = input.value.trim();
+                                  if (url) {
+                                    const newAttachment = {
+                                      name: url.split('/').pop() || 'Link',
+                                      url: url,
+                                      type: 'link'
+                                    };
+                                    field.onChange([...field.value, newAttachment]);
+                                    input.value = '';
+                                  }
                                 }
-                              }
-                            }}
-                          />
-                          <div className="text-sm text-muted-foreground">
-                            Pressione Enter para adicionar cada link
+                              }}
+                            />
+                            <p className="text-sm text-muted-foreground">
+                              💡 Pressione Enter para adicionar. Adicione playlists, cifras, slides...
+                            </p>
                           </div>
                           {field.value.length > 0 && (
                             <div className="space-y-2">
                               {field.value.map((attachment, index) => (
-                                <div key={index} className="flex items-center justify-between p-2 border rounded">
-                                  <div className="flex items-center gap-2">
-                                    <Paperclip className="h-4 w-4" />
-                                    <span className="text-sm">{attachment.name}</span>
+                                <div key={index} className="flex items-center justify-between p-4 border rounded-lg bg-card hover:bg-accent/50 transition-colors">
+                                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                                    <Paperclip className="h-5 w-5 text-primary shrink-0" />
+                                    <span className="text-sm font-medium truncate">{attachment.name}</span>
                                   </div>
                                   <Button
                                     type="button"
                                     variant="ghost"
                                     size="sm"
+                                    className="shrink-0"
                                     onClick={() => {
                                       const updated = field.value.filter((_, i) => i !== index);
                                       field.onChange(updated);

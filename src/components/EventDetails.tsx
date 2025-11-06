@@ -197,31 +197,6 @@ const EventDetails = ({ event, open, onOpenChange }: EventDetailsProps) => {
                       </div>
                     </CardHeader>
                     <CardContent className="pt-6 space-y-6">
-                      {/* Versões e Links - Aparecem primeiro, próximo ao cabeçalho */}
-                      {attachments.length > 0 && (
-                        <div className="space-y-3 pb-4 border-b">
-                          <h4 className="font-bold text-lg flex items-center gap-2 text-primary">
-                            <ExternalLink className="h-5 w-5" />
-                            Versões e Materiais de Estudo
-                          </h4>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                            {attachments.map((attachment, idx) => (
-                              <a
-                                key={idx}
-                                href={attachment.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-accent transition-colors group"
-                              >
-                                <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-primary shrink-0" />
-                                <span className="flex-1 text-sm font-medium group-hover:text-primary truncate">{attachment.name}</span>
-                                <span className="text-xs text-muted-foreground shrink-0">↗</span>
-                              </a>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
                       {/* Transpositor de Acordes */}
                       {(eventSong.song?.chords || eventSong.song?.lyrics) && (
                         <ChordTransposer
@@ -269,9 +244,9 @@ const EventDetails = ({ event, open, onOpenChange }: EventDetailsProps) => {
                         </div>
                       )}
 
-                      {!eventSong.song?.chords && !eventSong.song?.lyrics && !attachments.length && (
+                      {!eventSong.song?.chords && !eventSong.song?.lyrics && (
                         <p className="text-center text-muted-foreground py-8">
-                          Nenhuma cifra, letra ou versão disponível para esta música
+                          Nenhuma cifra ou letra disponível para esta música
                         </p>
                       )}
                     </CardContent>

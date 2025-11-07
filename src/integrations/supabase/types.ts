@@ -240,6 +240,7 @@ export type Database = {
           id: string
           is_favorite: boolean | null
           last_played: string | null
+          links: Json | null
           lyrics: string | null
           musical_key: string | null
           team_id: string | null
@@ -255,6 +256,7 @@ export type Database = {
           id?: string
           is_favorite?: boolean | null
           last_played?: string | null
+          links?: Json | null
           lyrics?: string | null
           musical_key?: string | null
           team_id?: string | null
@@ -270,6 +272,7 @@ export type Database = {
           id?: string
           is_favorite?: boolean | null
           last_played?: string | null
+          links?: Json | null
           lyrics?: string | null
           musical_key?: string | null
           team_id?: string | null

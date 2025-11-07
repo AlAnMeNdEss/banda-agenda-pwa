@@ -16,6 +16,7 @@ export interface EventSong {
     bpm: number | null;
     lyrics: string | null;
     chords: string | null;
+    links: Array<{name: string; url: string}> | null;
   } | null;
 }
 
@@ -43,7 +44,7 @@ export const useEventSongs = (eventId: string) => {
       const songIds = data.map(es => es.song_id);
       const { data: songs, error: songsError } = await supabase
         .from('songs')
-        .select('id, title, artist, musical_key, category, bpm, lyrics, chords')
+        .select('id, title, artist, musical_key, category, bpm, lyrics, chords, links')
         .in('id', songIds);
       
       if (songsError) throw songsError;

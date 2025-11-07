@@ -72,6 +72,7 @@ const SongForm = ({ children, song }: SongFormProps) => {
         lyrics: data.lyrics || null,
         chords: data.chords || null,
         last_played: null,
+        links: null,
       };
       
       if (song) {

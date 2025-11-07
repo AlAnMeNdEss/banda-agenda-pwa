@@ -14,6 +14,7 @@ export interface Song {
   chords: string | null;
   last_played: string | null;
   team_id: string | null;
+  links: Array<{name: string; url: string}> | null;
   created_at: string;
   updated_at: string;
 }

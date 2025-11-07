@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Calendar, Clock, MapPin, Music, Users, FileText, ExternalLink, ArrowLeft } from "lucide-react";
+import { Calendar, Clock, MapPin, Music, Users, FileText, ExternalLink, ArrowLeft, ChevronDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useEvents } from "@/hooks/useEvents";
 import { useEventSongs } from "@/hooks/useEventSongs";
 import { useEventParticipants } from "@/hooks/useEventParticipants";
@@ -242,34 +243,76 @@ const EventoDetalhes = () => {
                       />
                     )}
 
-                    {/* Cifras */}
-                    {eventSong.song?.chords && (
+                    {/* Links da Música (YouTube, etc) */}
+                    {eventSong.song?.links && Array.isArray(eventSong.song.links) && eventSong.song.links.length > 0 && (
                       <div className="space-y-3">
                         <h4 className="font-bold text-lg flex items-center gap-2 text-primary">
-                          <Music className="h-5 w-5" />
-                          Cifra e Acordes
+                          <ExternalLink className="h-5 w-5" />
+                          Links e Referências
                         </h4>
-                        <div className="p-6 bg-muted/50 rounded-lg border-2 border-primary/10">
-                          <pre className="font-mono text-base whitespace-pre-wrap leading-loose tracking-wide">
-                            {transposedChords[eventSong.id] || eventSong.song.chords}
-                          </pre>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {eventSong.song.links.map((link, linkIndex) => (
+                            <a
+                              key={linkIndex}
+                              href={link.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-accent transition-colors group"
+                            >
+                              <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-primary flex-shrink-0" />
+                              <span className="flex-1 text-sm font-medium group-hover:text-primary truncate">{link.name}</span>
+                              <span className="text-xs text-muted-foreground">↗</span>
+                            </a>
+                          ))}
                         </div>
                       </div>
                     )}
 
-                    {/* Letra */}
-                    {eventSong.song?.lyrics && (
-                      <div className="space-y-3">
-                        <h4 className="font-bold text-lg flex items-center gap-2 text-primary">
-                          <FileText className="h-5 w-5" />
-                          Letra
-                        </h4>
-                        <div className="p-6 bg-accent/20 rounded-lg border">
-                          <pre className="text-base whitespace-pre-wrap leading-loose">
-                            {transposedLyrics[eventSong.id] || eventSong.song.lyrics}
-                          </pre>
-                        </div>
-                      </div>
+                    {/* Accordion para Cifra e Letra */}
+                    {(eventSong.song?.chords || eventSong.song?.lyrics) && (
+                      <Accordion type="single" collapsible defaultValue="content" className="w-full">
+                        <AccordionItem value="content" className="border rounded-lg">
+                          <AccordionTrigger className="px-4 hover:no-underline">
+                            <div className="flex items-center gap-2 text-lg font-bold text-primary">
+                              <Music className="h-5 w-5" />
+                              <span>Cifra e Letra</span>
+                            </div>
+                          </AccordionTrigger>
+                          <AccordionContent className="px-4 pb-4">
+                            <div className="space-y-6 pt-4">
+                              {/* Cifras */}
+                              {eventSong.song?.chords && (
+                                <div className="space-y-3">
+                                  <h4 className="font-bold text-base flex items-center gap-2 text-foreground">
+                                    <Music className="h-4 w-4" />
+                                    Cifra e Acordes
+                                  </h4>
+                                  <div className="p-6 bg-muted/50 rounded-lg border-2 border-primary/10">
+                                    <pre className="font-mono text-base whitespace-pre-wrap leading-loose tracking-wide">
+                                      {transposedChords[eventSong.id] || eventSong.song.chords}
+                                    </pre>
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Letra */}
+                              {eventSong.song?.lyrics && (
+                                <div className="space-y-3">
+                                  <h4 className="font-bold text-base flex items-center gap-2 text-foreground">
+                                    <FileText className="h-4 w-4" />
+                                    Letra
+                                  </h4>
+                                  <div className="p-6 bg-accent/20 rounded-lg border">
+                                    <pre className="text-base whitespace-pre-wrap leading-loose">
+                                      {transposedLyrics[eventSong.id] || eventSong.song.lyrics}
+                                    </pre>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
+                      </Accordion>
                     )}
 
                     {!eventSong.song?.chords && !eventSong.song?.lyrics && (

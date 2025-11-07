@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Calendar, Clock, Plus, Search, List, CalendarDays } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,15 +9,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useEvents, Event, useDeleteEvent } from "@/hooks/useEvents";
 import { useAuth } from "@/contexts/AuthContext";
 import EventForm from "@/components/EventForm";
-import EventDetails from "@/components/EventDetails";
 import CalendarView from "@/components/CalendarView";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 
 const Agenda = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-  const [detailsOpen, setDetailsOpen] = useState(false);
   const [deletingEventId, setDeletingEventId] = useState<string | null>(null);
   const { data: events = [], isLoading } = useEvents();
   const { hasRole } = useAuth();
@@ -117,10 +116,7 @@ const Agenda = () => {
                 <Card 
                   key={event.id} 
                   className="shadow-gentle hover:shadow-celestial transition-all duration-300 cursor-pointer"
-                  onClick={() => {
-                    setSelectedEvent(event);
-                    setDetailsOpen(true);
-                  }}
+                  onClick={() => navigate(`/evento/${event.id}`)}
                 >
                   <CardContent className="p-6">
                     <div className="flex flex-col md:flex-row md:items-center gap-4">
@@ -209,19 +205,10 @@ const Agenda = () => {
           <TabsContent value="calendar">
             <CalendarView 
               events={filteredEvents}
-              onEventClick={(event) => {
-                setSelectedEvent(event);
-                setDetailsOpen(true);
-              }}
+              onEventClick={(event) => navigate(`/evento/${event.id}`)}
             />
           </TabsContent>
         </Tabs>
-
-        <EventDetails 
-          event={selectedEvent}
-          open={detailsOpen}
-          onOpenChange={setDetailsOpen}
-        />
 
         <AlertDialog open={!!deletingEventId} onOpenChange={(open) => !open && setDeletingEventId(null)}>
           <AlertDialogContent>

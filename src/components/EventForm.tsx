@@ -8,7 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCreateEvent, useUpdateEvent, Event } from "@/hooks/useEvents";
 import { useToast } from "@/hooks/use-toast";
@@ -151,28 +152,28 @@ const EventForm = ({ children, event, onOpenChange }: EventFormProps) => {
   };
 
   return (
-    <Dialog open={open} onOpenChange={(newOpen) => {
+    <Sheet open={open} onOpenChange={(newOpen) => {
       setOpen(newOpen);
       onOpenChange?.(newOpen);
     }}>
-      <DialogTrigger asChild>
+      <SheetTrigger asChild>
         {children}
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[900px] max-h-[90vh] flex flex-col p-0 gap-0">
-        <DialogHeader className="px-8 pt-8 pb-6 bg-gradient-to-br from-primary/5 via-primary/5 to-transparent border-b shrink-0">
+      </SheetTrigger>
+      <SheetContent side="right" className="w-full sm:max-w-full p-0 flex flex-col gap-0">
+        <SheetHeader className="px-6 sm:px-8 pt-6 sm:pt-8 pb-4 sm:pb-6 bg-gradient-to-br from-primary/5 via-primary/5 to-transparent border-b shrink-0">
           <div className="space-y-2">
-            <DialogTitle className="text-3xl font-bold text-foreground">
+            <SheetTitle className="text-2xl sm:text-3xl font-bold text-foreground">
               {isEditing ? "Editar Evento" : "Criar Novo Evento"}
-            </DialogTitle>
-            <p className="text-muted-foreground">
+            </SheetTitle>
+            <p className="text-sm sm:text-base text-muted-foreground">
               {isEditing ? "Atualize as informações do evento" : "Preencha os detalhes e organize seu evento"}
             </p>
           </div>
-        </DialogHeader>
+        </SheetHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col flex-1 min-h-0">
             <Tabs defaultValue="basic" className="w-full flex-1 flex flex-col min-h-0">
-              <TabsList className="grid w-full grid-cols-4 h-auto p-1.5 gap-1 bg-muted/50 mx-8 mt-6 rounded-lg shrink-0">
+              <TabsList className="grid w-full grid-cols-4 h-auto p-1.5 gap-1 bg-muted/50 mx-4 sm:mx-8 mt-4 sm:mt-6 rounded-lg shrink-0">
                 <TabsTrigger 
                   value="basic" 
                   className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-sm transition-all"
@@ -207,8 +208,8 @@ const EventForm = ({ children, event, onOpenChange }: EventFormProps) => {
                 </TabsTrigger>
               </TabsList>
 
-              <div className="flex-1 min-h-0 overflow-hidden">
-                <div className="h-full overflow-y-auto px-8 pb-6">
+              <ScrollArea className="flex-1 min-h-0">
+                <div className="px-4 sm:px-8 pb-6">
               <TabsContent value="basic" className="space-y-6 mt-6">
                 <div className="space-y-5 animate-fade-in">
                   <FormField
@@ -471,10 +472,10 @@ const EventForm = ({ children, event, onOpenChange }: EventFormProps) => {
                 />
               </TabsContent>
                 </div>
-              </div>
+              </ScrollArea>
             </Tabs>
 
-            <div className="flex justify-end gap-3 pt-4 border-t px-6 pb-6 shrink-0">
+            <div className="flex justify-end gap-3 pt-4 border-t px-4 sm:px-6 pb-4 sm:pb-6 shrink-0">
               <Button 
                 type="button" 
                 variant="outline" 
@@ -500,8 +501,8 @@ const EventForm = ({ children, event, onOpenChange }: EventFormProps) => {
             </div>
           </form>
         </Form>
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 };
 

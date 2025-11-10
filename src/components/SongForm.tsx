@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Music } from "lucide-react";
+import { Music, Plus, Trash2, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -22,6 +22,10 @@ const songSchema = z.object({
   is_favorite: z.boolean().default(false),
   lyrics: z.string().max(10000, "Letra deve ter no máximo 10000 caracteres").optional(),
   chords: z.string().max(5000, "Cifra deve ter no máximo 5000 caracteres").optional(),
+  links: z.array(z.object({
+    name: z.string().min(1, "Nome é obrigatório"),
+    url: z.string().url("URL inválida"),
+  })).optional(),
 });
 
 type SongFormData = z.infer<typeof songSchema>;
@@ -48,6 +52,7 @@ const SongForm = ({ children, song }: SongFormProps) => {
       is_favorite: song.is_favorite,
       lyrics: song.lyrics || "",
       chords: song.chords || "",
+      links: song.links || [],
     } : {
       title: "",
       artist: "",
@@ -57,11 +62,19 @@ const SongForm = ({ children, song }: SongFormProps) => {
       is_favorite: false,
       lyrics: "",
       chords: "",
+      links: [],
     },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "links",
   });
 
   const onSubmit = async (data: SongFormData) => {
     try {
+      const validLinks = data.links?.filter(link => link.name && link.url) as Array<{name: string; url: string}> | undefined;
+      
       const songData = {
         title: data.title,
         artist: data.artist,
@@ -72,7 +85,7 @@ const SongForm = ({ children, song }: SongFormProps) => {
         lyrics: data.lyrics || null,
         chords: data.chords || null,
         last_played: null,
-        links: null,
+        links: validLinks && validLinks.length > 0 ? validLinks : null,
       };
       
       if (song) {
@@ -244,6 +257,65 @@ const SongForm = ({ children, song }: SongFormProps) => {
                 </FormItem>
               )}
             />
+
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <FormLabel className="text-base">Links e Materiais</FormLabel>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => append({ name: "", url: "" })}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Adicionar Link
+                </Button>
+              </div>
+              
+              {fields.length > 0 && (
+                <div className="space-y-3">
+                  {fields.map((field, index) => (
+                    <div key={field.id} className="flex gap-2 items-start p-3 border rounded-md bg-muted/30">
+                      <div className="flex-1 space-y-2">
+                        <FormField
+                          control={form.control}
+                          name={`links.${index}.name`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormControl>
+                                <Input placeholder="Nome (ex: YouTube, Spotify)" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name={`links.${index}.url`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormControl>
+                                <Input placeholder="URL completa (https://...)" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => remove(index)}
+                        className="mt-1"
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
 
             <div className="flex justify-end gap-3 pt-4">
               <Button 

@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Play, Pause, Volume2 } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface MetronomeProps {
   defaultBpm?: number;
@@ -12,7 +13,10 @@ const Metronome = ({ defaultBpm = 120 }: MetronomeProps) => {
   const [bpm, setBpm] = useState(defaultBpm);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentBeat, setCurrentBeat] = useState(0);
-  const [beatsPerMeasure] = useState(4);
+  const [beatsPerMeasure, setBeatsPerMeasure] = useState(4);
+  const [volume, setVolume] = useState(0.3);
+  const [lastTapTime, setLastTapTime] = useState<number | null>(null);
+  const [tapTimeouts, setTapTimeouts] = useState<number[]>([]);
   
   const audioContextRef = useRef<AudioContext | null>(null);
   const nextNoteTimeRef = useRef(0);
@@ -49,10 +53,34 @@ const Metronome = ({ defaultBpm = 120 }: MetronomeProps) => {
 
     // Accent on first beat
     osc.frequency.value = isAccent ? 1000 : 800;
-    gain.gain.value = isAccent ? 0.3 : 0.15;
+    gain.gain.value = isAccent ? volume : volume * 0.5;
 
     osc.start(time);
     osc.stop(time + 0.05);
+  };
+
+  const handleTapTempo = () => {
+    const now = Date.now();
+    
+    if (lastTapTime && now - lastTapTime < 2000) {
+      const interval = now - lastTapTime;
+      const newBpm = Math.round(60000 / interval);
+      if (newBpm >= 40 && newBpm <= 240) {
+        setBpm(newBpm);
+      }
+    }
+    
+    setLastTapTime(now);
+    
+    // Clear previous timeout
+    tapTimeouts.forEach(clearTimeout);
+    
+    // Reset tap after 2 seconds of inactivity
+    const timeout = window.setTimeout(() => {
+      setLastTapTime(null);
+    }, 2000);
+    
+    setTapTimeouts([timeout]);
   };
 
   const scheduleNote = () => {
@@ -124,6 +152,10 @@ const Metronome = ({ defaultBpm = 120 }: MetronomeProps) => {
         </div>
 
         <div className="space-y-3">
+          <div className="flex items-center justify-between text-sm text-muted-foreground mb-1">
+            <span>Andamento</span>
+            <span>{bpm} BPM</span>
+          </div>
           <Slider
             value={[bpm]}
             onValueChange={(value) => setBpm(value[0])}
@@ -138,6 +170,51 @@ const Metronome = ({ defaultBpm = 120 }: MetronomeProps) => {
             <span>240</span>
           </div>
         </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-2">
+            <label className="text-sm text-muted-foreground">Compasso</label>
+            <Select
+              value={beatsPerMeasure.toString()}
+              onValueChange={(value) => setBeatsPerMeasure(parseInt(value))}
+              disabled={isPlaying}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="2">2/4</SelectItem>
+                <SelectItem value="3">3/4</SelectItem>
+                <SelectItem value="4">4/4</SelectItem>
+                <SelectItem value="6">6/8</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="space-y-2">
+            <label className="text-sm text-muted-foreground flex items-center gap-2">
+              <Volume2 className="h-4 w-4" />
+              Volume
+            </label>
+            <Slider
+              value={[volume * 100]}
+              onValueChange={(value) => setVolume(value[0] / 100)}
+              min={0}
+              max={100}
+              step={1}
+              className="w-full"
+            />
+          </div>
+        </div>
+
+        <Button
+          onClick={handleTapTempo}
+          variant="outline"
+          className="w-full"
+          disabled={isPlaying}
+        >
+          Tap Tempo
+        </Button>
 
         <div className="flex items-center justify-center gap-2 py-4">
           {[...Array(beatsPerMeasure)].map((_, i) => (

@@ -243,31 +243,6 @@ const EventoDetalhes = () => {
                       />
                     )}
 
-                    {/* Links da Música (YouTube, etc) */}
-                    {eventSong.song?.links && Array.isArray(eventSong.song.links) && eventSong.song.links.length > 0 && (
-                      <div className="space-y-3">
-                        <h4 className="font-bold text-lg flex items-center gap-2 text-primary">
-                          <ExternalLink className="h-5 w-5" />
-                          Links e Referências
-                        </h4>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          {eventSong.song.links.map((link, linkIndex) => (
-                            <a
-                              key={linkIndex}
-                              href={link.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-accent transition-colors group"
-                            >
-                              <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-primary flex-shrink-0" />
-                              <span className="flex-1 text-sm font-medium group-hover:text-primary truncate">{link.name}</span>
-                              <span className="text-xs text-muted-foreground">↗</span>
-                            </a>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
                     {/* Accordion para Cifra e Letra */}
                     {(eventSong.song?.chords || eventSong.song?.lyrics) && (
                       <Accordion type="single" collapsible defaultValue="content" className="w-full">
@@ -306,6 +281,32 @@ const EventoDetalhes = () => {
                                     <pre className="text-base whitespace-pre-wrap leading-loose">
                                       {transposedLyrics[eventSong.id] || eventSong.song.lyrics}
                                     </pre>
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Links da Música (YouTube, Spotify, etc) */}
+                              {eventSong.song?.links && Array.isArray(eventSong.song.links) && eventSong.song.links.length > 0 && (
+                                <div className="space-y-3">
+                                  <Separator className="my-4" />
+                                  <h4 className="font-bold text-base flex items-center gap-2 text-primary">
+                                    <ExternalLink className="h-5 w-5" />
+                                    Versão da Música
+                                  </h4>
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                    {eventSong.song.links.map((link, linkIndex) => (
+                                      <a
+                                        key={linkIndex}
+                                        href={link.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-accent transition-colors group"
+                                      >
+                                        <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-primary flex-shrink-0" />
+                                        <span className="flex-1 text-sm font-medium group-hover:text-primary truncate">{link.name}</span>
+                                        <span className="text-xs text-muted-foreground">↗</span>
+                                      </a>
+                                    ))}
                                   </div>
                                 </div>
                               )}

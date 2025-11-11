@@ -68,15 +68,15 @@ const Agenda = () => {
 
   return (
     <div className="min-h-screen bg-gradient-worship">
-      <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="max-w-7xl mx-auto px-2 md:px-6 py-6 md:py-12">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-primary mb-2">Agenda de Eventos</h1>
-          <p className="text-muted-foreground">Gerencie eventos e ensaios do ministério</p>
+        <div className="mb-4 md:mb-8 px-2 md:px-0">
+          <h1 className="text-2xl md:text-3xl font-bold text-primary mb-1 md:mb-2">Agenda de Eventos</h1>
+          <p className="text-sm md:text-base text-muted-foreground">Gerencie eventos e ensaios do ministério</p>
         </div>
 
         {/* Actions Bar */}
-        <div className="flex flex-col md:flex-row gap-4 mb-8">
+        <div className="flex flex-col md:flex-row gap-3 md:gap-4 mb-4 md:mb-8 px-2 md:px-0">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <Input
@@ -115,10 +115,10 @@ const Agenda = () => {
               {filteredEvents.map((event) => (
                 <Card 
                   key={event.id} 
-                  className="shadow-gentle hover:shadow-celestial transition-all duration-300 cursor-pointer"
+                  className="border-0 md:border md:shadow-gentle md:hover:shadow-celestial transition-all duration-300 cursor-pointer"
                   onClick={() => navigate(`/evento/${event.id}`)}
                 >
-                  <CardContent className="p-6">
+                  <CardContent className="p-3 md:p-6">
                     <div className="flex flex-col md:flex-row md:items-center gap-4">
                       {/* Date Badge */}
                       <div className="flex-shrink-0">

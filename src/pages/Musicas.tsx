@@ -77,15 +77,15 @@ const Musicas = () => {
 
   return (
     <div className="min-h-screen bg-gradient-worship">
-      <div className="max-w-6xl mx-auto px-6 py-12">
+      <div className="max-w-6xl mx-auto px-2 md:px-6 py-6 md:py-12">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-primary mb-2">Banco de Músicas</h1>
-          <p className="text-muted-foreground">Gerencie o repertório do ministério</p>
+        <div className="mb-4 md:mb-8 px-2 md:px-0">
+          <h1 className="text-2xl md:text-3xl font-bold text-primary mb-1 md:mb-2">Banco de Músicas</h1>
+          <p className="text-sm md:text-base text-muted-foreground">Gerencie o repertório do ministério</p>
         </div>
 
         {/* Actions Bar */}
-        <div className="flex flex-col gap-4 mb-8">
+        <div className="flex flex-col gap-3 md:gap-4 mb-4 md:mb-8 px-2 md:px-0">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
@@ -168,33 +168,33 @@ const Musicas = () => {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <Card className="shadow-gentle">
-            <CardContent className="p-4 text-center">
-              <Music className="h-8 w-8 text-primary mx-auto mb-2" />
-              <div className="text-2xl font-bold text-primary">{songs.length}</div>
-              <div className="text-sm text-muted-foreground">Total</div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mb-4 md:mb-8">
+          <Card className="border-0 md:border md:shadow-gentle">
+            <CardContent className="p-3 md:p-4 text-center">
+              <Music className="h-6 w-6 md:h-8 md:w-8 text-primary mx-auto mb-1 md:mb-2" />
+              <div className="text-xl md:text-2xl font-bold text-primary">{songs.length}</div>
+              <div className="text-xs md:text-sm text-muted-foreground">Total</div>
             </CardContent>
           </Card>
-            <Card className="shadow-gentle">
-              <CardContent className="p-4 text-center">
-                <Heart className="h-8 w-8 text-accent mx-auto mb-2" />
-                <div className="text-2xl font-bold text-primary">{songs.filter((s: Song) => s.is_favorite).length}</div>
-                <div className="text-sm text-muted-foreground">Favoritas</div>
+            <Card className="border-0 md:border md:shadow-gentle">
+              <CardContent className="p-3 md:p-4 text-center">
+                <Heart className="h-6 w-6 md:h-8 md:w-8 text-accent mx-auto mb-1 md:mb-2" />
+                <div className="text-xl md:text-2xl font-bold text-primary">{songs.filter((s: Song) => s.is_favorite).length}</div>
+                <div className="text-xs md:text-sm text-muted-foreground">Favoritas</div>
               </CardContent>
             </Card>
-            <Card className="shadow-gentle">
-              <CardContent className="p-4 text-center">
-                <div className="h-8 w-8 bg-gradient-celestial rounded mx-auto mb-2 flex items-center justify-center text-primary-foreground font-bold text-sm">L</div>
-                <div className="text-2xl font-bold text-primary">{songs.filter((s: Song) => s.category === 'louvor').length}</div>
-                <div className="text-sm text-muted-foreground">Louvor</div>
+            <Card className="border-0 md:border md:shadow-gentle">
+              <CardContent className="p-3 md:p-4 text-center">
+                <div className="h-6 w-6 md:h-8 md:w-8 bg-gradient-celestial rounded mx-auto mb-1 md:mb-2 flex items-center justify-center text-primary-foreground font-bold text-xs md:text-sm">L</div>
+                <div className="text-xl md:text-2xl font-bold text-primary">{songs.filter((s: Song) => s.category === 'louvor').length}</div>
+                <div className="text-xs md:text-sm text-muted-foreground">Louvor</div>
               </CardContent>
             </Card>
-            <Card className="shadow-gentle">
-              <CardContent className="p-4 text-center">
-                <div className="h-8 w-8 bg-gradient-divine rounded mx-auto mb-2 flex items-center justify-center text-accent-foreground font-bold text-sm">A</div>
-                <div className="text-2xl font-bold text-primary">{songs.filter((s: Song) => s.category === 'adoracao').length}</div>
-                <div className="text-sm text-muted-foreground">Adoração</div>
+            <Card className="border-0 md:border md:shadow-gentle">
+              <CardContent className="p-3 md:p-4 text-center">
+                <div className="h-6 w-6 md:h-8 md:w-8 bg-gradient-divine rounded mx-auto mb-1 md:mb-2 flex items-center justify-center text-accent-foreground font-bold text-xs md:text-sm">A</div>
+                <div className="text-xl md:text-2xl font-bold text-primary">{songs.filter((s: Song) => s.category === 'adoracao').length}</div>
+                <div className="text-xs md:text-sm text-muted-foreground">Adoração</div>
               </CardContent>
             </Card>
         </div>
@@ -204,11 +204,11 @@ const Musicas = () => {
           {filteredSongs.map((song) => (
             <Card 
               key={song.id} 
-              className={`shadow-gentle hover:shadow-celestial transition-all duration-300 ${
+              className={`border-0 md:border md:shadow-gentle md:hover:shadow-celestial transition-all duration-300 ${
                 selectedSongs.includes(song.id) ? 'ring-2 ring-primary bg-primary/5' : ''
               }`}
             >
-              <CardContent className="p-6">
+              <CardContent className="p-3 md:p-6">
                 <div className="flex flex-col md:flex-row md:items-center gap-4">
                   {/* Checkbox for selection */}
                   {canManageSongs && (

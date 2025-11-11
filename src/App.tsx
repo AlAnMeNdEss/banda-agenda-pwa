@@ -20,7 +20,7 @@ const AppContent = () => {
   const showNavigation = location.pathname !== '/auth';
 
   return (
-    <div className="min-h-screen pb-20">
+    <div className="min-h-screen pb-16 md:pb-20">
       <Routes>
         <Route path="/auth" element={<Auth />} />
         <Route path="/" element={

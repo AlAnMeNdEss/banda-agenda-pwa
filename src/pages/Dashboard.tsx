@@ -43,39 +43,39 @@ const Dashboard = () => {
           className="absolute inset-0 w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-black/40" />
-        <div className="relative px-6 py-20 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg">
+        <div className="relative px-3 md:px-6 py-12 md:py-20 text-center">
+          <h1 className="text-3xl md:text-6xl font-bold text-white mb-3 md:mb-4 drop-shadow-lg">
             Ministério de Louvor
           </h1>
-          <p className="text-xl text-white/95 max-w-2xl mx-auto drop-shadow-md">
+          <p className="text-base md:text-xl text-white/95 max-w-2xl mx-auto drop-shadow-md">
             Gerenciamento completo da agenda e repertório do seu ministério
           </p>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="max-w-7xl mx-auto px-2 md:px-6 py-6 md:py-12">
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-6 mb-6 md:mb-12">
           {stats.map(({ label, value, icon: Icon }) => (
-            <Card key={label} className="shadow-gentle hover:shadow-celestial transition-all duration-300">
-              <CardHeader className="pb-2">
+            <Card key={label} className="border-0 md:border md:shadow-gentle md:hover:shadow-celestial transition-all duration-300">
+              <CardHeader className="pb-1 md:pb-2 p-3 md:p-6">
                 <div className="flex items-center gap-2">
-                  <div className="p-2 bg-gradient-divine rounded-lg">
-                    <Icon className="h-5 w-5 text-accent-foreground" />
+                  <div className="p-1.5 md:p-2 bg-gradient-divine rounded-lg">
+                    <Icon className="h-4 w-4 md:h-5 md:w-5 text-accent-foreground" />
                   </div>
                 </div>
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-primary mb-1">{value}</div>
-                <p className="text-sm text-muted-foreground">{label}</p>
+              <CardContent className="p-3 pt-0 md:p-6 md:pt-0">
+                <div className="text-xl md:text-2xl font-bold text-primary mb-0.5 md:mb-1">{value}</div>
+                <p className="text-xs md:text-sm text-muted-foreground">{label}</p>
               </CardContent>
             </Card>
           ))}
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 mb-8">
+        <div className="grid md:grid-cols-2 gap-3 md:gap-8 mb-6 md:mb-8">
           {/* Próximos Eventos */}
-          <Card className="shadow-gentle">
+          <Card className="border-0 md:border md:shadow-gentle">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-2">

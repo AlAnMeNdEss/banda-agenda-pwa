@@ -139,7 +139,7 @@ const TeamBannerUpload = () => {
     <div className="space-y-4">
       <div className="flex gap-2">
         <Button
-          variant="outline"
+          variant="secondary"
           disabled={uploading}
           className="relative"
           asChild

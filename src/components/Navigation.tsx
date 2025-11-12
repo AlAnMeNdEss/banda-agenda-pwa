@@ -3,7 +3,6 @@ import { NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import UserProfile from "@/components/UserProfile";
 import { useAuth } from "@/contexts/AuthContext";
-import { ThemeToggle } from "@/components/ThemeToggle";
 
 const Navigation = () => {
   const { user } = useAuth();
@@ -38,7 +37,6 @@ const Navigation = () => {
           ))}
         </div>
         <div className="flex items-center gap-1">
-          <ThemeToggle />
           {user && (
             <div className="ml-1">
               <UserProfile />

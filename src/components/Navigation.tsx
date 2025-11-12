@@ -17,7 +17,7 @@ const Navigation = () => {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-lg border-t md:border-t border-border md:shadow-celestial">
-      <div className="flex items-center justify-between py-1.5 md:py-2 px-2 md:px-4 max-w-md mx-auto">
+      <div className="flex items-center justify-between py-3 md:py-2 px-2 md:px-4 max-w-md mx-auto">
         <div className="flex items-center justify-around flex-1">
           {navItems.map(({ to, icon: Icon, label }) => (
             <NavLink
@@ -25,15 +25,15 @@ const Navigation = () => {
               to={to}
               className={({ isActive }) =>
                 cn(
-                  "flex flex-col items-center gap-0.5 md:gap-1 py-1.5 md:py-2 px-2 md:px-3 rounded-lg transition-all duration-200 min-w-0",
+                  "flex flex-col items-center gap-1 md:gap-1 py-2 md:py-2 px-3 md:px-3 rounded-lg transition-all duration-200 min-w-0",
                   isActive
                     ? "text-primary"
                     : "text-muted-foreground hover:text-foreground"
                 )
               }
             >
-              <Icon className="h-4 w-4 md:h-5 md:w-5" />
-              <span className="text-[10px] md:text-xs font-medium truncate">{label}</span>
+              <Icon className="h-6 w-6 md:h-5 md:w-5" />
+              <span className="text-xs md:text-xs font-medium truncate">{label}</span>
             </NavLink>
           ))}
         </div>

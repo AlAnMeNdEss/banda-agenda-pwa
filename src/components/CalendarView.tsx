@@ -24,7 +24,7 @@ const CalendarView = ({ events, onEventClick }: CalendarViewProps) => {
   const eventDates = events.map((event) => parseISO(event.event_date));
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1fr_400px]">
+    <div className="flex flex-col gap-6">
       <Card>
         <CardHeader>
           <CardTitle>Calendário</CardTitle>

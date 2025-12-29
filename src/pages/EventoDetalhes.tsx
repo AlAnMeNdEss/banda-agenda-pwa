@@ -292,191 +292,228 @@ const EventoDetalhes = () => {
     const lightGray = [226, 232, 240]; // #e2e8f0
     const mediumGray = [160, 174, 192]; // #a0aec0
 
-    // Título do evento - Clean e minimalista
-    doc.setTextColor(...textColor);
-    doc.setFontSize(24);
+    // Função auxiliar para desenhar card
+    const drawCard = (x: number, y: number, width: number, height: number, title?: string) => {
+      // Borda do card
+      doc.setDrawColor(...lightGray);
+      doc.setLineWidth(0.5);
+      doc.roundedRect(x, y, width, height, 2, 2, 'S');
+      
+      // Fundo sutil
+      doc.setFillColor(250, 250, 250);
+      doc.roundedRect(x, y, width, height, 2, 2, 'F');
+      
+      // Borda novamente por cima
+      doc.setDrawColor(...lightGray);
+      doc.roundedRect(x, y, width, height, 2, 2, 'S');
+      
+      // Título do card se fornecido
+      if (title) {
+        doc.setFillColor(...primaryColor);
+        doc.roundedRect(x, y, width, 8, 2, 2, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'bold');
+        doc.text(title, x + 3, y + 5.5);
+        doc.setTextColor(...textColor);
+      }
+    };
+
+    // Card do Título do Evento
+    const titleCardHeight = 15;
+    drawCard(margin, yPosition, contentWidth, titleCardHeight);
+    doc.setFontSize(20);
     doc.setFont('helvetica', 'bold');
-    doc.text(eventTitle, margin, yPosition, { maxWidth: contentWidth, align: 'left' });
+    doc.setTextColor(...primaryColor);
+    doc.text(eventTitle, margin + 5, yPosition + 10, { maxWidth: contentWidth - 10, align: 'left' });
+    yPosition += titleCardHeight + 10;
 
-    yPosition += 15;
-
-    // Informações do evento - Clean
-    doc.setTextColor(...textColor);
+    // Card de Informações do Evento
+    let infoCardHeight = 20;
+    if (event.description) infoCardHeight += 15;
+    if (event.notes) infoCardHeight += 15;
+    
+    drawCard(margin, yPosition, contentWidth, infoCardHeight, 'Informações do Evento');
+    
+    let infoY = yPosition + 12;
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...textColor);
     
-    const infoLines = [
-      `Data: ${eventDate}`,
-      `Horário: ${eventTime}${event.end_time ? ` - ${event.end_time}` : ''}`,
-      `Local: ${eventLocation}`
-    ];
-
-    infoLines.forEach((line, index) => {
-      doc.text(line, margin, yPosition + (index * 6));
-    });
-
-    yPosition += 25;
+    doc.setFont('helvetica', 'bold');
+    doc.text('📅 Data:', margin + 5, infoY);
+    doc.setFont('helvetica', 'normal');
+    doc.text(eventDate, margin + 25, infoY);
+    infoY += 6;
+    
+    doc.setFont('helvetica', 'bold');
+    doc.text('🕐 Horário:', margin + 5, infoY);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`${eventTime}${event.end_time ? ` - ${event.end_time}` : ''}`, margin + 25, infoY);
+    infoY += 6;
+    
+    doc.setFont('helvetica', 'bold');
+    doc.text('📍 Local:', margin + 5, infoY);
+    doc.setFont('helvetica', 'normal');
+    doc.text(eventLocation, margin + 25, infoY);
+    infoY += 8;
 
     if (event.description) {
       doc.setFont('helvetica', 'bold');
-      doc.text('Descrição:', margin, yPosition);
-      yPosition += 6;
+      doc.text('📝 Descrição:', margin + 5, infoY);
+      infoY += 6;
       doc.setFont('helvetica', 'normal');
-      const descLines = doc.splitTextToSize(event.description, contentWidth);
-      doc.text(descLines, margin, yPosition);
-      yPosition += descLines.length * 5 + 5;
+      const descLines = doc.splitTextToSize(event.description, contentWidth - 10);
+      doc.text(descLines, margin + 5, infoY);
+      infoY += descLines.length * 5 + 3;
     }
 
     if (event.notes) {
       doc.setFont('helvetica', 'bold');
-      doc.text('Observações:', margin, yPosition);
-      yPosition += 6;
+      doc.text('📌 Observações:', margin + 5, infoY);
+      infoY += 6;
       doc.setFont('helvetica', 'normal');
-      const notesLines = doc.splitTextToSize(event.notes, contentWidth);
-      doc.text(notesLines, margin, yPosition);
-      yPosition += notesLines.length * 5 + 10;
+      const notesLines = doc.splitTextToSize(event.notes, contentWidth - 10);
+      doc.text(notesLines, margin + 5, infoY);
     }
 
-    // Linha separadora
-    doc.setDrawColor(...lightGray);
-    doc.line(margin, yPosition, pageWidth - margin, yPosition);
-    yPosition += 10;
+    yPosition += infoCardHeight + 10;
 
-    // Equipe - Clean
+    // Card da Equipe
     if (participants.length > 0) {
-      doc.setFontSize(14);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(...primaryColor);
-      doc.text('Equipe', margin, yPosition);
-      yPosition += 8;
+      const cardPadding = 5;
+      const memberHeight = 12;
+      const teamCardHeight = 15 + (participants.length * memberHeight);
+      
+      if (yPosition + teamCardHeight > pageHeight - margin) {
+        doc.addPage();
+        yPosition = margin;
+      }
 
+      drawCard(margin, yPosition, contentWidth, teamCardHeight, '👥 Equipe');
+      
+      let memberY = yPosition + 12;
       doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(...textColor);
 
       participants.forEach((p) => {
-        if (yPosition > pageHeight - 30) {
-          doc.addPage();
-          yPosition = margin;
-        }
-
         const name = p.profile?.display_name || 'Sem nome';
         const role = p.profile?.ministry_function || '';
-        const confirmed = p.confirmed ? '✓ Confirmado' : '';
+        const confirmed = p.confirmed;
 
+        // Nome
         doc.setFont('helvetica', 'bold');
-        doc.text(`• ${name}`, margin + 5, yPosition);
-        yPosition += 5;
+        doc.setTextColor(...textColor);
+        doc.text(`• ${name}`, margin + cardPadding, memberY);
+        memberY += 5;
 
+        // Função
         if (role) {
           doc.setFont('helvetica', 'normal');
           doc.setTextColor(...mediumGray);
-          doc.text(`  ${role}`, margin + 5, yPosition);
-          yPosition += 5;
+          doc.text(`  ${role}`, margin + cardPadding, memberY);
+          memberY += 5;
         }
 
+        // Status de confirmação
         if (confirmed) {
           doc.setTextColor(16, 185, 129); // green
-          doc.text(`  ${confirmed}`, margin + 5, yPosition);
-          yPosition += 5;
+          doc.text(`  ✓ Confirmado`, margin + cardPadding, memberY);
+          memberY += 5;
+        } else {
+          doc.setTextColor(239, 68, 68); // red
+          doc.text(`  ⏳ Pendente`, margin + cardPadding, memberY);
+          memberY += 5;
         }
 
-        doc.setTextColor(...textColor);
-        yPosition += 3;
+        memberY += 2;
       });
 
-      yPosition += 5;
-      doc.setDrawColor(...lightGray);
-      doc.line(margin, yPosition, pageWidth - margin, yPosition);
-      yPosition += 10;
+      yPosition += teamCardHeight + 10;
     }
 
-    // Repertório - Clean e intuitivo
+    // Cards do Repertório
     if (eventSongs.length > 0) {
-      doc.setFontSize(14);
+      doc.setFontSize(16);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(...primaryColor);
-      doc.text('Repertório', margin, yPosition);
-      yPosition += 8;
+      doc.text('🎵 Repertório', margin, yPosition);
+      yPosition += 10;
 
       eventSongs.forEach((eventSong, index) => {
         const song = eventSong.song;
         if (!song) return;
 
-        if (yPosition > pageHeight - 40) {
+        let songCardHeight = 25;
+        if (song.musical_key || song.bpm) songCardHeight += 5;
+
+        if (yPosition + songCardHeight > pageHeight - margin) {
           doc.addPage();
           yPosition = margin;
         }
 
-        // Número da música - círculo clean
+        // Card da música
+        drawCard(margin, yPosition, contentWidth, songCardHeight);
+        
+        // Número da música - badge
         doc.setFillColor(...primaryColor);
-        doc.circle(margin + 5, yPosition - 2, 4, 'F');
+        doc.circle(margin + 8, yPosition + 8, 5, 'F');
         doc.setTextColor(255, 255, 255);
-        doc.setFontSize(8);
+        doc.setFontSize(10);
         doc.setFont('helvetica', 'bold');
-        doc.text(String(index + 1), margin + 5, yPosition, { align: 'center' });
+        doc.text(String(index + 1), margin + 8, yPosition + 9.5, { align: 'center' });
 
         // Título da música
         doc.setTextColor(...textColor);
-        doc.setFontSize(12);
+        doc.setFontSize(13);
         doc.setFont('helvetica', 'bold');
-        doc.text(song.title, margin + 15, yPosition);
-
-        yPosition += 6;
+        doc.text(song.title, margin + 18, yPosition + 8, { maxWidth: contentWidth - 25 });
 
         // Artista
         doc.setFontSize(10);
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(...mediumGray);
-        doc.text(song.artist || 'Artista não informado', margin + 15, yPosition);
+        doc.text(song.artist || 'Artista não informado', margin + 18, yPosition + 14);
 
-        yPosition += 6;
-
-        // Detalhes (Tom e BPM) - Clean
-        const details = [];
-        if (song.musical_key) details.push(`Tom: ${song.musical_key}`);
-        if (song.bpm) details.push(`BPM: ${song.bpm}`);
-
-        if (details.length > 0) {
+        // Detalhes (Tom e BPM)
+        if (song.musical_key || song.bpm) {
+          const details = [];
+          if (song.musical_key) details.push(`🎹 Tom: ${song.musical_key}`);
+          if (song.bpm) details.push(`🥁 BPM: ${song.bpm}`);
+          
           doc.setFontSize(9);
           doc.setTextColor(...textColor);
-          doc.text(details.join(' • '), margin + 15, yPosition);
-          yPosition += 6;
+          doc.text(details.join('  •  '), margin + 18, yPosition + 20);
         }
 
-        yPosition += 5;
+        yPosition += songCardHeight + 8;
       });
-
-      yPosition += 5;
-      doc.setDrawColor(...lightGray);
-      doc.line(margin, yPosition, pageWidth - margin, yPosition);
-      yPosition += 10;
     }
 
-    // Metrônomo - Clean
+    // Card do Metrônomo
     const bpmValues = eventSongs.map(es => es.song?.bpm).filter(BPM => BPM !== null && BPM !== undefined);
     if (bpmValues.length > 0) {
-      if (yPosition > pageHeight - 30) {
+      const metronomeCardHeight = 20;
+      
+      if (yPosition + metronomeCardHeight > pageHeight - margin) {
         doc.addPage();
         yPosition = margin;
       }
 
       const avgBpm = Math.round(bpmValues.reduce((a, b) => a + b, 0) / bpmValues.length);
       
+      drawCard(margin, yPosition, contentWidth, metronomeCardHeight, '🎚️ Metrônomo');
+      
       doc.setFontSize(14);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(...primaryColor);
-      doc.text('Metrônomo', margin, yPosition);
-      yPosition += 8;
-
-      doc.setFontSize(11);
-      doc.setFont('helvetica', 'normal');
-      doc.setTextColor(...textColor);
-      doc.text(`BPM Médio: ${avgBpm} BPM`, margin, yPosition);
-      yPosition += 6;
+      doc.text(`${avgBpm} BPM`, margin + 5, yPosition + 15);
+      
       doc.setFontSize(9);
+      doc.setFont('helvetica', 'normal');
       doc.setTextColor(...mediumGray);
-      doc.text('Baseado nas músicas do repertório', margin, yPosition);
+      doc.text('Baseado nas músicas do repertório', margin + 5, yPosition + 20);
     }
 
     // Salvar PDF

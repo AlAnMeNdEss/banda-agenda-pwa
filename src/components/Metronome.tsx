@@ -24,7 +24,10 @@ const Metronome = ({ defaultBpm = 120 }: MetronomeProps) => {
 
   useEffect(() => {
     // Initialize AudioContext
-    audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const AudioContextClass = window.AudioContext || (window as typeof window & { webkitAudioContext?: new () => AudioContext }).webkitAudioContext;
+    if (AudioContextClass) {
+      audioContextRef.current = new AudioContextClass();
+    }
     
     return () => {
       if (timerIdRef.current) {

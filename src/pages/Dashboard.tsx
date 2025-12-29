@@ -34,9 +34,9 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-worship">
+    <div className="min-h-screen bg-gradient-to-br from-background to-background/80 p-2 sm:p-4">
       {/* Hero Section */}
-      <div className="relative overflow-hidden">
+      <div className="relative overflow-hidden rounded-lg mb-4 sm:mb-6">
         <img 
           src={team?.banner_url || worshipHero} 
           alt="Worship background" 
@@ -53,7 +53,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12">
+      <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6">
         {/* Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-8 md:mb-12">
           {stats.map(({ label, value, icon: Icon }) => (

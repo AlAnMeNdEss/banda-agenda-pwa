@@ -1,4 +1,4 @@
-import { LogOut, User, Settings } from 'lucide-react';
+import { LogOut, User, Settings, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -18,6 +18,8 @@ import { useState } from 'react';
 const UserProfile = () => {
   const { user, profile, signOut } = useAuth();
   const [profileDialogOpen, setProfileDialogOpen] = useState(false);
+  const feedbackNumber = "5588994163669";
+  const whatsappLink = `https://wa.me/${feedbackNumber}?text=${encodeURIComponent("Olá! Gostaria de enviar um feedback sobre o app da banda.")}`;
 
   if (!user || !profile) return null;
 
@@ -111,6 +113,13 @@ const UserProfile = () => {
         <DropdownMenuItem className="cursor-pointer">
           <Settings className="mr-2 h-4 w-4" />
           <span>Configurações</span>
+        </DropdownMenuItem>
+
+        <DropdownMenuItem asChild className="cursor-pointer">
+          <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="flex items-center">
+            <MessageCircle className="mr-2 h-4 w-4" />
+            <span>Feedback (WhatsApp)</span>
+          </a>
         </DropdownMenuItem>
         
         <DropdownMenuSeparator />

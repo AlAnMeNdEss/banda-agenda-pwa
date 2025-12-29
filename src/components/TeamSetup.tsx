@@ -146,11 +146,12 @@ const TeamSetup = ({ onComplete }: TeamSetupProps) => {
       });
 
       onComplete();
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error joining team:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Erro ao entrar na equipe';
       toast({
         title: "Erro",
-        description: error.message || "Erro ao entrar na equipe",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

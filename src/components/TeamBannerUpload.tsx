@@ -89,10 +89,11 @@ const TeamBannerUpload = () => {
         title: "Sucesso",
         description: "Banner da equipe atualizado com sucesso!",
       });
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido ao fazer upload';
       toast({
         title: "Erro ao fazer upload",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -124,10 +125,11 @@ const TeamBannerUpload = () => {
         title: "Sucesso",
         description: "Banner removido com sucesso!",
       });
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido ao remover banner';
       toast({
         title: "Erro ao remover banner",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Calendar, Clock, MapPin, Music, Users, FileText, ExternalLink } from "lucide-react";
+import { Calendar, Clock, MapPin, Music, Users, FileText, ExternalLink, Download, Printer } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,6 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Event } from "@/hooks/useEvents";
 import { useEventSongs } from "@/hooks/useEventSongs";
 import { useEventParticipants } from "@/hooks/useEventParticipants";
@@ -43,6 +44,405 @@ const EventDetails = ({ event, open, onOpenChange }: EventDetailsProps) => {
   } catch (e) {
     console.error('Error parsing attachments:', e);
   }
+
+  const escapeHtml = (text: string) => {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  };
+
+  const handlePrintScale = () => {
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+
+    const eventDate = formatDate(event.event_date);
+    const eventTime = escapeHtml(event.event_time);
+    const eventLocation = escapeHtml(event.location || 'Local não informado');
+    const eventTitle = escapeHtml(event.title);
+
+    let htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>Escala - ${eventTitle}</title>
+        <style>
+          @media print {
+            @page { margin: 1cm; }
+          }
+          body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            color: #333;
+          }
+          .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 20px;
+          }
+          .header h1 {
+            margin: 0 0 10px 0;
+            font-size: 24px;
+          }
+          .event-info {
+            margin-bottom: 20px;
+            font-size: 14px;
+            line-height: 1.6;
+          }
+          .section {
+            margin-bottom: 30px;
+            page-break-inside: avoid;
+          }
+          .section-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #ccc;
+          }
+          .song-item {
+            margin-bottom: 20px;
+            page-break-inside: avoid;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+          }
+          .song-number {
+            display: inline-block;
+            background: #333;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-right: 10px;
+          }
+          .song-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 10px 0 5px 0;
+          }
+          .song-artist {
+            color: #666;
+            margin-bottom: 10px;
+            font-size: 14px;
+          }
+          .song-details {
+            font-size: 13px;
+            color: #666;
+            margin-top: 8px;
+            margin-bottom: 10px;
+          }
+          .song-details span {
+            margin-right: 15px;
+          }
+          .lyrics-section {
+            margin-top: 15px;
+            padding: 15px;
+            background: #fafafa;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-size: 12px;
+            line-height: 1.6;
+          }
+          .team-member {
+            padding: 10px;
+            margin-bottom: 8px;
+            background: #f5f5f5;
+            border-radius: 5px;
+            border-left: 3px solid #333;
+          }
+          .team-member-name {
+            font-weight: bold;
+            margin-bottom: 4px;
+          }
+          .team-member-role {
+            font-size: 12px;
+            color: #666;
+          }
+          .metronome-info {
+            padding: 15px;
+            background: #e8f4f8;
+            border-radius: 5px;
+            border-left: 4px solid #2196F3;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>${eventTitle}</h1>
+          <div class="event-info">
+            <strong>Data:</strong> ${escapeHtml(eventDate)}<br>
+            <strong>Horário:</strong> ${eventTime}${event.end_time ? ` - ${escapeHtml(event.end_time)}` : ''}<br>
+            <strong>Local:</strong> ${eventLocation}
+            ${event.description ? `<br><br><strong>Descrição:</strong><br>${escapeHtml(event.description)}` : ''}
+            ${event.notes ? `<br><br><strong>Observações:</strong><br>${escapeHtml(event.notes)}` : ''}
+          </div>
+        </div>
+
+        ${participants.length > 0 ? `
+        <div class="section">
+          <div class="section-title">Equipe</div>
+          ${participants.map(p => `
+            <div class="team-member">
+              <div class="team-member-name">${escapeHtml(p.profile?.display_name || 'Sem nome')}</div>
+              ${p.profile?.ministry_function ? `<div class="team-member-role">${escapeHtml(p.profile.ministry_function)}</div>` : ''}
+              ${p.confirmed ? '<div style="color: green; font-size: 11px; margin-top: 4px;">✓ Confirmado</div>' : ''}
+            </div>
+          `).join('')}
+        </div>
+        ` : ''}
+
+        ${eventSongs.length > 0 ? `
+        <div class="section">
+          <div class="section-title">Repertório</div>
+    ` : ''}
+
+    eventSongs.forEach((eventSong, index) => {
+      const song = eventSong.song;
+      if (!song) return;
+
+      htmlContent += `
+        <div class="song-item">
+          <div>
+            <span class="song-number">${index + 1}</span>
+            <span class="song-title">${escapeHtml(song.title)}</span>
+          </div>
+          <div class="song-artist">${escapeHtml(song.artist)}</div>
+          <div class="song-details">
+            ${song.musical_key ? `<span><strong>Tom:</strong> ${escapeHtml(song.musical_key)}</span>` : ''}
+            ${song.bpm ? `<span><strong>BPM:</strong> ${song.bpm}</span>` : ''}
+          </div>
+        </div>
+      `;
+    });
+
+    if (eventSongs.length > 0) {
+      htmlContent += `</div>`;
+    }
+
+    // Metrônomo
+    const bpmValues = eventSongs.map(es => es.song?.bpm).filter(BPM => BPM !== null && BPM !== undefined);
+    if (bpmValues.length > 0) {
+      const avgBpm = Math.round(bpmValues.reduce((a, b) => a + b, 0) / bpmValues.length);
+      htmlContent += `
+        <div class="section">
+          <div class="section-title">Metrônomo</div>
+          <div class="metronome-info">
+            <strong>BPM Médio:</strong> ${avgBpm} BPM<br>
+            <small>Baseado nas músicas do repertório</small>
+          </div>
+        </div>
+      `;
+    }
+
+    htmlContent += `
+      </body>
+      </html>
+    `;
+
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => {
+      printWindow.print();
+    }, 250);
+  };
+
+  const handleDownloadScale = () => {
+    const eventDate = formatDate(event.event_date);
+    const eventTime = escapeHtml(event.event_time);
+    const eventLocation = escapeHtml(event.location || 'Local não informado');
+    const eventTitle = escapeHtml(event.title);
+
+    let htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>Escala - ${eventTitle}</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            color: #333;
+          }
+          .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 20px;
+          }
+          .header h1 {
+            margin: 0 0 10px 0;
+            font-size: 24px;
+          }
+          .event-info {
+            margin-bottom: 20px;
+            font-size: 14px;
+            line-height: 1.6;
+          }
+          .section {
+            margin-bottom: 30px;
+            page-break-inside: avoid;
+          }
+          .section-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #ccc;
+          }
+          .song-item {
+            margin-bottom: 20px;
+            page-break-inside: avoid;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+          }
+          .song-number {
+            display: inline-block;
+            background: #333;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-right: 10px;
+          }
+          .song-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 10px 0 5px 0;
+          }
+          .song-artist {
+            color: #666;
+            margin-bottom: 10px;
+            font-size: 14px;
+          }
+          .song-details {
+            font-size: 13px;
+            color: #666;
+            margin-top: 8px;
+            margin-bottom: 10px;
+          }
+          .song-details span {
+            margin-right: 15px;
+          }
+          .lyrics-section {
+            margin-top: 15px;
+            padding: 15px;
+            background: #fafafa;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-size: 12px;
+            line-height: 1.6;
+          }
+          .team-member {
+            padding: 10px;
+            margin-bottom: 8px;
+            background: #f5f5f5;
+            border-radius: 5px;
+            border-left: 3px solid #333;
+          }
+          .team-member-name {
+            font-weight: bold;
+            margin-bottom: 4px;
+          }
+          .team-member-role {
+            font-size: 12px;
+            color: #666;
+          }
+          .metronome-info {
+            padding: 15px;
+            background: #e8f4f8;
+            border-radius: 5px;
+            border-left: 4px solid #2196F3;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>${eventTitle}</h1>
+          <div class="event-info">
+            <strong>Data:</strong> ${escapeHtml(eventDate)}<br>
+            <strong>Horário:</strong> ${eventTime}${event.end_time ? ` - ${escapeHtml(event.end_time)}` : ''}<br>
+            <strong>Local:</strong> ${eventLocation}
+            ${event.description ? `<br><br><strong>Descrição:</strong><br>${escapeHtml(event.description)}` : ''}
+            ${event.notes ? `<br><br><strong>Observações:</strong><br>${escapeHtml(event.notes)}` : ''}
+          </div>
+        </div>
+
+        ${participants.length > 0 ? `
+        <div class="section">
+          <div class="section-title">Equipe</div>
+          ${participants.map(p => `
+            <div class="team-member">
+              <div class="team-member-name">${escapeHtml(p.profile?.display_name || 'Sem nome')}</div>
+              ${p.profile?.ministry_function ? `<div class="team-member-role">${escapeHtml(p.profile.ministry_function)}</div>` : ''}
+              ${p.confirmed ? '<div style="color: green; font-size: 11px; margin-top: 4px;">✓ Confirmado</div>' : ''}
+            </div>
+          `).join('')}
+        </div>
+        ` : ''}
+
+        ${eventSongs.length > 0 ? `
+        <div class="section">
+          <div class="section-title">Repertório</div>
+    ` : ''}
+
+    eventSongs.forEach((eventSong, index) => {
+      const song = eventSong.song;
+      if (!song) return;
+
+      htmlContent += `
+        <div class="song-item">
+          <div>
+            <span class="song-number">${index + 1}</span>
+            <span class="song-title">${escapeHtml(song.title)}</span>
+          </div>
+          <div class="song-artist">${escapeHtml(song.artist)}</div>
+          <div class="song-details">
+            ${song.musical_key ? `<span><strong>Tom:</strong> ${escapeHtml(song.musical_key)}</span>` : ''}
+            ${song.bpm ? `<span><strong>BPM:</strong> ${song.bpm}</span>` : ''}
+          </div>
+        </div>
+      `;
+    });
+
+    if (eventSongs.length > 0) {
+      htmlContent += `</div>`;
+    }
+
+    // Metrônomo
+    const bpmValues = eventSongs.map(es => es.song?.bpm).filter(BPM => BPM !== null && BPM !== undefined);
+    if (bpmValues.length > 0) {
+      const avgBpm = Math.round(bpmValues.reduce((a, b) => a + b, 0) / bpmValues.length);
+      htmlContent += `
+        <div class="section">
+          <div class="section-title">Metrônomo</div>
+          <div class="metronome-info">
+            <strong>BPM Médio:</strong> ${avgBpm} BPM<br>
+            <small>Baseado nas músicas do repertório</small>
+          </div>
+        </div>
+      `;
+    }
+
+    htmlContent += `
+      </body>
+      </html>
+    `;
+
+    const blob = new Blob([htmlContent], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Escala_${eventTitle.replace(/[^a-z0-9]/gi, '_')}_${eventDate.replace(/[^a-z0-9]/gi, '_')}.html`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -166,6 +566,26 @@ const EventDetails = ({ event, open, onOpenChange }: EventDetailsProps) => {
                   </CardContent>
                 </Card>
               ) : (
+                <>
+                  {/* Botões de Download e Impressão */}
+                  <div className="flex gap-2 justify-end">
+                    <Button 
+                      onClick={handleDownloadScale}
+                      variant="outline"
+                      className="gap-2"
+                    >
+                      <Download className="h-4 w-4" />
+                      Baixar Escala
+                    </Button>
+                    <Button 
+                      onClick={handlePrintScale}
+                      variant="outline"
+                      className="gap-2"
+                    >
+                      <Printer className="h-4 w-4" />
+                      Imprimir Escala
+                    </Button>
+                  </div>
                 eventSongs.map((eventSong, index) => (
                   <Card key={eventSong.id} className="overflow-hidden">
                     <CardHeader className="bg-gradient-to-r from-primary/10 to-transparent pb-4">
@@ -214,34 +634,77 @@ const EventDetails = ({ event, open, onOpenChange }: EventDetailsProps) => {
                         />
                       )}
 
-                      {/* Cifras */}
-                      {eventSong.song?.chords && (
-                        <div className="space-y-3">
-                          <h4 className="font-bold text-lg flex items-center gap-2 text-primary">
-                            <Music className="h-5 w-5" />
-                            Cifra e Acordes
-                          </h4>
-                          <div className="p-6 bg-muted/50 rounded-lg border-2 border-primary/10">
-                            <pre className="font-mono text-base whitespace-pre-wrap leading-loose tracking-wide">
-                              {transposedChords[eventSong.id] || eventSong.song.chords}
-                            </pre>
-                          </div>
-                        </div>
+                      {/* Cifra e Letra (colapsado por padrão) */}
+                      {(eventSong.song?.chords || eventSong.song?.lyrics) && (
+                        <Accordion type="single" collapsible className="w-full">
+                          <AccordionItem value="content" className="border rounded-lg">
+                            <AccordionTrigger className="px-4 hover:no-underline">
+                              <div className="flex items-center gap-2 text-lg font-bold text-primary">
+                                <Music className="h-5 w-5" />
+                                <span>Cifra e Letra</span>
+                              </div>
+                            </AccordionTrigger>
+                            <AccordionContent className="px-4 pb-4">
+                              <div className="space-y-6 pt-4">
+                                {/* Cifras */}
+                                {eventSong.song?.chords && (
+                                  <div className="space-y-3">
+                                    <h4 className="font-bold text-base flex items-center gap-2 text-foreground">
+                                      <Music className="h-4 w-4" />
+                                      Cifra e Acordes
+                                    </h4>
+                                    <div className="p-6 bg-muted/50 rounded-lg border-2 border-primary/10">
+                                      <pre className="font-mono text-base whitespace-pre-wrap leading-loose tracking-wide">
+                                        {transposedChords[eventSong.id] || eventSong.song.chords}
+                                      </pre>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Letra */}
+                                {eventSong.song?.lyrics && (
+                                  <div className="space-y-3">
+                                    <h4 className="font-bold text-base flex items-center gap-2 text-foreground">
+                                      <FileText className="h-4 w-4" />
+                                      Letra
+                                    </h4>
+                                    <div className="p-6 bg-accent/20 rounded-lg border">
+                                      <pre className="text-base whitespace-pre-wrap leading-loose">
+                                        {transposedLyrics[eventSong.id] || eventSong.song.lyrics}
+                                      </pre>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            </AccordionContent>
+                          </AccordionItem>
+                        </Accordion>
                       )}
 
-                      {/* Letra */}
-                      {eventSong.song?.lyrics && (
-                        <div className="space-y-3">
-                          <h4 className="font-bold text-lg flex items-center gap-2 text-primary">
-                            <FileText className="h-5 w-5" />
-                            Letra
-                          </h4>
-                          <div className="p-6 bg-accent/20 rounded-lg border">
-                            <pre className="text-base whitespace-pre-wrap leading-loose">
-                              {transposedLyrics[eventSong.id] || eventSong.song.lyrics}
-                            </pre>
-                          </div>
-                        </div>
+                      {/* Links da música (YouTube, Spotify, etc) */}
+                      {eventSong.song?.links && Array.isArray(eventSong.song.links) && eventSong.song.links.length > 0 && (
+                        <Card className="bg-card/60 border-primary/10">
+                          <CardHeader className="pb-2">
+                            <CardTitle className="text-base flex items-center gap-2">
+                              <ExternalLink className="h-4 w-4" />
+                              Links da música
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent className="pt-0 flex flex-wrap gap-2">
+                            {eventSong.song.links.map((link, linkIndex) => (
+                              <a
+                                key={linkIndex}
+                                href={link.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border bg-background hover:bg-accent transition-colors text-sm font-medium"
+                              >
+                                <ExternalLink className="h-3.5 w-3.5" />
+                                <span>{link.name}</span>
+                              </a>
+                            ))}
+                          </CardContent>
+                        </Card>
                       )}
 
                       {!eventSong.song?.chords && !eventSong.song?.lyrics && (
@@ -252,6 +715,7 @@ const EventDetails = ({ event, open, onOpenChange }: EventDetailsProps) => {
                     </CardContent>
                   </Card>
                 ))
+                </>
               )}
             </TabsContent>
 
@@ -310,3 +774,4 @@ const EventDetails = ({ event, open, onOpenChange }: EventDetailsProps) => {
 };
 
 export default EventDetails;
+

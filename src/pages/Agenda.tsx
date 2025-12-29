@@ -67,16 +67,16 @@ const Agenda = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-worship">
-      <div className="max-w-7xl mx-auto px-2 md:px-6 py-6 md:py-12">
+    <div className="min-h-screen bg-gradient-to-br from-background to-background/80 p-2 sm:p-4">
+      <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6">
         {/* Header */}
-        <div className="mb-4 md:mb-8 px-2 md:px-0">
-          <h1 className="text-2xl md:text-3xl font-bold text-primary mb-1 md:mb-2">Agenda de Eventos</h1>
-          <p className="text-sm md:text-base text-muted-foreground">Gerencie eventos e ensaios do ministério</p>
+        <div>
+          <h1 className="text-xl sm:text-2xl font-bold text-primary mb-1 sm:mb-2">Agenda de Eventos</h1>
+          <p className="text-sm text-muted-foreground">Gerencie eventos e ensaios do ministério</p>
         </div>
 
         {/* Actions Bar */}
-        <div className="flex flex-col md:flex-row gap-3 md:gap-4 mb-4 md:mb-8 px-2 md:px-0">
+        <div className="flex flex-col md:flex-row gap-3 md:gap-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <Input

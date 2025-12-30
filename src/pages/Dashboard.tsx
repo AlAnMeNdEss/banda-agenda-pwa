@@ -54,26 +54,37 @@ const Dashboard = () => {
       </div>
 
       <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-8 md:mb-12">
-          {stats.map(({ label, value, icon: Icon }) => (
-            <Card key={label} className="shadow-gentle hover:shadow-celestial transition-all duration-300">
-              <CardHeader className="pb-2 p-4 md:p-6">
-                <div className="flex items-center gap-2">
-                  <div className="p-2 bg-gradient-divine rounded-lg">
-                    <Icon className="h-5 w-5 text-accent-foreground" />
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="p-4 pt-0 md:p-6 md:pt-0">
-                <div className="text-2xl font-bold text-primary mb-1">{value}</div>
-                <p className="text-sm text-muted-foreground">{label}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        {/* Card Principal com Estatísticas */}
+        <Card className="shadow-gentle">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Calendar className="h-5 w-5 text-primary" />
+              Visão Geral
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {/* Stats Cards */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+              {stats.map(({ label, value, icon: Icon }) => (
+                <Card key={label} className="hover:shadow-gentle transition-shadow">
+                  <CardHeader className="pb-2 p-4 md:p-6">
+                    <div className="flex items-center gap-2">
+                      <div className="p-2 bg-gradient-divine rounded-lg">
+                        <Icon className="h-5 w-5 text-accent-foreground" />
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-4 pt-0 md:p-6 md:pt-0">
+                    <div className="text-2xl font-bold text-primary mb-1">{value}</div>
+                    <p className="text-sm text-muted-foreground">{label}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
-        <div className="grid md:grid-cols-2 gap-6 md:gap-8 mb-8">
+        <div className="grid md:grid-cols-2 gap-6 md:gap-8">
           {/* Próximos Eventos */}
           <Card className="shadow-gentle">
             <CardHeader>
@@ -88,27 +99,37 @@ const Dashboard = () => {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {upcomingEvents.map((event) => (
-                  <div key={event.id} className="flex items-center gap-4 p-3 rounded-lg bg-muted/50">
-                    <div className="p-2 bg-primary rounded-lg">
-                      <Calendar className="h-4 w-4 text-primary-foreground" />
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="font-medium">{event.title}</h4>
-                      <p className="text-sm text-muted-foreground">
-                        {new Date(event.event_date).toLocaleDateString('pt-BR')} às {event.event_time}
-                      </p>
-                    </div>
-                    <div className={`px-2 py-1 rounded text-xs font-medium ${
-                      event.event_type === 'ensaio' 
-                        ? 'bg-accent/20 text-accent-foreground' 
-                        : 'bg-primary/20 text-primary'
-                    }`}>
-                      {event.event_type === 'ensaio' ? 'Ensaio' : 'Evento'}
-                    </div>
-                  </div>
+                  <Card key={event.id} className="hover:shadow-gentle transition-shadow">
+                    <CardContent className="p-3">
+                      <div className="flex items-center gap-4">
+                        <div className="p-2 bg-primary rounded-lg">
+                          <Calendar className="h-4 w-4 text-primary-foreground" />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-medium">{event.title}</h4>
+                          <p className="text-sm text-muted-foreground">
+                            {new Date(event.event_date).toLocaleDateString('pt-BR')} às {event.event_time}
+                          </p>
+                        </div>
+                        <div className={`px-2 py-1 rounded text-xs font-medium ${
+                          event.event_type === 'ensaio' 
+                            ? 'bg-accent/20 text-accent-foreground' 
+                            : 'bg-primary/20 text-primary'
+                        }`}>
+                          {event.event_type === 'ensaio' ? 'Ensaio' : 'Evento'}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 ))}
+                {upcomingEvents.length === 0 && (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Calendar className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                    <p>Nenhum evento próximo</p>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -119,27 +140,34 @@ const Dashboard = () => {
 
         {/* Ações Administrativas (apenas para admins) */}
         {hasRole('admin') && (
-          <div className="mb-8">
+          <div>
             <AdminActions />
           </div>
         )}
 
         {/* Team Info for Admins */}
         {hasRole('admin') && team && (
-          <div className="bg-gradient-celestial rounded-lg p-6 text-white mb-8">
-            <h2 className="text-xl font-bold mb-4">Informações da Equipe</h2>
-            <div className="space-y-4">
-              <div>
-                <p className="text-white/90 mb-2">Equipe: {team.name}</p>
-                <p className="text-white/90 mb-4">Código da Equipe: <span className="font-bold tracking-widest">{team.team_code}</span></p>
-                <p className="text-sm text-white/80 mb-4">Compartilhe o código acima para outros membros entrarem na equipe.</p>
+          <Card className="shadow-gentle bg-gradient-celestial border-none">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                Informações da Equipe
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-white">
+              <div className="space-y-4">
+                <div>
+                  <p className="text-white/90 mb-2">Equipe: {team.name}</p>
+                  <p className="text-white/90 mb-4">Código da Equipe: <span className="font-bold tracking-widest">{team.team_code}</span></p>
+                  <p className="text-sm text-white/80 mb-4">Compartilhe o código acima para outros membros entrarem na equipe.</p>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">Banner da Equipe</h3>
+                  <TeamBannerUpload />
+                </div>
               </div>
-              <div>
-                <h3 className="text-lg font-semibold mb-2">Banner da Equipe</h3>
-                <TeamBannerUpload />
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         )}
       </div>
     </div>

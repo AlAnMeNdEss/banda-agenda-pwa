@@ -75,29 +75,39 @@ const Agenda = () => {
           <p className="text-sm text-muted-foreground">Gerencie eventos e ensaios do ministério</p>
         </div>
 
-        {/* Actions Bar */}
-        <div className="flex flex-col md:flex-row gap-3 md:gap-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-            <Input
-              placeholder="Buscar eventos..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-          {hasRole('admin') && (
-            <EventForm>
-              <Button className="bg-gradient-celestial hover:shadow-celestial">
-                <Plus className="h-4 w-4 mr-2" />
-                Novo Evento
-              </Button>
-            </EventForm>
-          )}
-        </div>
-
-        {/* Tabs para alternar entre visualizações */}
-        <Tabs defaultValue="list" className="w-full">
+        {/* Card Principal */}
+        <Card className="shadow-gentle">
+          <CardHeader>
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="h-5 w-5 text-primary" />
+                Eventos e Ensaios
+              </CardTitle>
+              {hasRole('admin') && (
+                <EventForm>
+                  <Button className="bg-gradient-celestial hover:shadow-celestial">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Novo Evento
+                  </Button>
+                </EventForm>
+              )}
+            </div>
+            
+            {/* Actions Bar dentro do header */}
+            <div className="relative mt-4">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Input
+                placeholder="Buscar eventos..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          </CardHeader>
+          
+          <CardContent>
+            {/* Tabs para alternar entre visualizações */}
+            <Tabs defaultValue="list" className="w-full">
           <TabsList className="grid w-full max-w-md grid-cols-2 mb-6">
             <TabsTrigger value="list" className="flex items-center gap-2">
               <List className="h-4 w-4" />
@@ -187,17 +197,15 @@ const Agenda = () => {
             </div>
 
             {filteredEvents.length === 0 && (
-              <Card className="shadow-gentle">
-                <CardContent className="p-12 text-center">
-                  <Calendar className="h-16 w-16 text-muted-foreground/50 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-muted-foreground mb-2">
-                    Nenhum evento encontrado
-                  </h3>
-                  <p className="text-muted-foreground">
-                    {searchTerm ? 'Tente um termo de busca diferente.' : 'Adicione o primeiro evento à agenda.'}
-                  </p>
-                </CardContent>
-              </Card>
+              <div className="p-12 text-center">
+                <Calendar className="h-16 w-16 text-muted-foreground/50 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-muted-foreground mb-2">
+                  Nenhum evento encontrado
+                </h3>
+                <p className="text-muted-foreground">
+                  {searchTerm ? 'Tente um termo de busca diferente.' : 'Adicione o primeiro evento à agenda.'}
+                </p>
+              </div>
             )}
           </TabsContent>
 
@@ -209,6 +217,8 @@ const Agenda = () => {
             />
           </TabsContent>
         </Tabs>
+          </CardContent>
+        </Card>
 
         <AlertDialog open={!!deletingEventId} onOpenChange={(open) => !open && setDeletingEventId(null)}>
           <AlertDialogContent>

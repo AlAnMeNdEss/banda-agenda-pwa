@@ -105,30 +105,34 @@ const TeamMembers = () => {
       <CardContent>
         <div className="space-y-3">
           {profiles.map((member) => (
-            <div key={member.id} className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 rounded-lg bg-muted/50">
-              <div className="flex items-center gap-3 flex-1 min-w-0">
-                <Avatar className="h-12 w-12 flex-shrink-0">
-                  {member.avatar_url && (
-                    <AvatarImage src={member.avatar_url} alt={member.display_name} />
-                  )}
-                  <AvatarFallback className="bg-primary text-primary-foreground">
-                    {getInitials(member.display_name)}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1 min-w-0">
-                  <h4 className="font-medium truncate">{member.display_name}</h4>
-                  {member.ministry_function && (
-                    <p className="text-sm text-muted-foreground truncate">{member.ministry_function}</p>
-                  )}
-                  {member.phone && (
-                    <p className="text-xs text-muted-foreground truncate">{member.phone}</p>
-                  )}
+            <Card key={member.id} className="hover:shadow-gentle transition-shadow">
+              <CardContent className="p-4">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <Avatar className="h-12 w-12 flex-shrink-0">
+                      {member.avatar_url && (
+                        <AvatarImage src={member.avatar_url} alt={member.display_name} />
+                      )}
+                      <AvatarFallback className="bg-primary text-primary-foreground">
+                        {getInitials(member.display_name)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-medium truncate">{member.display_name}</h4>
+                      {member.ministry_function && (
+                        <p className="text-sm text-muted-foreground truncate">{member.ministry_function}</p>
+                      )}
+                      {member.phone && (
+                        <p className="text-xs text-muted-foreground truncate">{member.phone}</p>
+                      )}
+                    </div>
+                  </div>
+                  <Badge variant={getRoleBadgeVariant(member.role)} className="w-fit">
+                    {getRoleLabel(member.role)}
+                  </Badge>
                 </div>
-              </div>
-              <Badge variant={getRoleBadgeVariant(member.role)} className="w-fit">
-                {getRoleLabel(member.role)}
-              </Badge>
-            </div>
+              </CardContent>
+            </Card>
           ))}
           {profiles.length === 0 && (
             <div className="text-center py-8 text-muted-foreground">

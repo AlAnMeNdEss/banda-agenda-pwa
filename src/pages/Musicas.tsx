@@ -84,91 +84,102 @@ const Musicas = () => {
           <p className="text-sm text-muted-foreground">Gerencie o repertório do ministério</p>
         </div>
 
-        {/* Actions Bar */}
-        <div className="flex flex-col gap-3 md:gap-4">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                placeholder="Buscar músicas..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
+        {/* Card Principal */}
+        <Card className="shadow-gentle">
+          <CardHeader>
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <CardTitle className="flex items-center gap-2">
+                <Music className="h-5 w-5 text-primary" />
+                Repertório do Ministério
+              </CardTitle>
+              {canManageSongs && (
+                <SongForm>
+                  <Button className="bg-gradient-divine hover:shadow-divine">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Nova Música
+                  </Button>
+                </SongForm>
+              )}
             </div>
-            
-            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="w-full md:w-48">
-                <SelectValue placeholder="Categoria" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map(category => (
-                  <SelectItem key={category.value} value={category.value}>
-                    {category.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
 
-            {canManageSongs && (
-              <SongForm>
-                <Button className="bg-gradient-divine hover:shadow-divine">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Nova Música
-                </Button>
-              </SongForm>
-            )}
-          </div>
-
-          {/* Selection Actions */}
-          {canManageSongs && filteredSongs.length > 0 && (
-            <Card className="bg-primary/5 border-primary/20">
-              <CardContent className="p-4">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 justify-between">
-                  <div className="flex items-center gap-3">
-                    <Checkbox
-                      checked={selectedSongs.length === filteredSongs.length && filteredSongs.length > 0}
-                      onCheckedChange={toggleSelectAll}
-                    />
-                    <span className="text-sm font-medium">
-                      {selectedSongs.length > 0 
-                        ? `${selectedSongs.length} música(s) selecionada(s)` 
-                        : 'Selecionar todas'}
-                    </span>
-                  </div>
-                  {selectedSongs.length > 0 && (
-                    <div className="flex gap-2 w-full sm:w-auto">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={clearSelection}
-                        className="flex-1 sm:flex-none"
-                      >
-                        Limpar Seleção
-                      </Button>
-                      <Button 
-                        size="sm"
-                        className="bg-gradient-celestial flex-1 sm:flex-none"
-                        onClick={() => {
-                          toast({
-                            title: "Músicas Selecionadas",
-                            description: `${selectedSongs.length} música(s) pronta(s) para adicionar ao evento`,
-                          });
-                        }}
-                      >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Usar no Evento
-                      </Button>
-                    </div>
-                  )}
+            {/* Actions Bar dentro do header */}
+            <div className="flex flex-col gap-3 mt-4">
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                  <Input
+                    placeholder="Buscar músicas..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
+                  />
                 </div>
-              </CardContent>
-            </Card>
-          )}
-        </div>
+                
+                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                  <SelectTrigger className="w-full md:w-48">
+                    <SelectValue placeholder="Categoria" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map(category => (
+                      <SelectItem key={category.value} value={category.value}>
+                        {category.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mb-4 md:mb-8">
+              {/* Selection Actions */}
+              {canManageSongs && filteredSongs.length > 0 && (
+                <Card className="bg-primary/5 border-primary/20">
+                  <CardContent className="p-4">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 justify-between">
+                      <div className="flex items-center gap-3">
+                        <Checkbox
+                          checked={selectedSongs.length === filteredSongs.length && filteredSongs.length > 0}
+                          onCheckedChange={toggleSelectAll}
+                        />
+                        <span className="text-sm font-medium">
+                          {selectedSongs.length > 0 
+                            ? `${selectedSongs.length} música(s) selecionada(s)` 
+                            : 'Selecionar todas'}
+                        </span>
+                      </div>
+                      {selectedSongs.length > 0 && (
+                        <div className="flex gap-2 w-full sm:w-auto">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={clearSelection}
+                            className="flex-1 sm:flex-none"
+                          >
+                            Limpar Seleção
+                          </Button>
+                          <Button 
+                            size="sm"
+                            className="bg-gradient-celestial flex-1 sm:flex-none"
+                            onClick={() => {
+                              toast({
+                                title: "Músicas Selecionadas",
+                                description: `${selectedSongs.length} música(s) pronta(s) para adicionar ao evento`,
+                              });
+                            }}
+                          >
+                            <Plus className="h-4 w-4 mr-2" />
+                            Usar no Evento
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          </CardHeader>
+
+          <CardContent>
+            {/* Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 mb-6">
           <Card className="border-0 md:border md:shadow-gentle">
             <CardContent className="p-3 md:p-4 text-center">
               <Music className="h-6 w-6 md:h-8 md:w-8 text-primary mx-auto mb-1 md:mb-2" />
@@ -199,16 +210,16 @@ const Musicas = () => {
             </Card>
         </div>
 
-        {/* Songs Grid */}
-        <div className="grid gap-4">
-          {filteredSongs.map((song) => (
-            <Card 
-              key={song.id} 
-              className={`border-0 md:border md:shadow-gentle md:hover:shadow-celestial transition-all duration-300 ${
-                selectedSongs.includes(song.id) ? 'ring-2 ring-primary bg-primary/5' : ''
-              }`}
-            >
-              <CardContent className="p-3 md:p-6">
+            {/* Songs Grid */}
+            <div className="grid gap-4">
+              {filteredSongs.map((song) => (
+                <Card 
+                  key={song.id} 
+                  className={`hover:shadow-gentle transition-shadow ${
+                    selectedSongs.includes(song.id) ? 'ring-2 ring-primary bg-primary/5' : ''
+                  }`}
+                >
+                  <CardContent className="p-4">
                 <div className="flex flex-col md:flex-row md:items-center gap-4">
                   {/* Checkbox for selection */}
                   {canManageSongs && (
@@ -289,21 +300,21 @@ const Musicas = () => {
           ))}
         </div>
 
-        {filteredSongs.length === 0 && (
-          <Card className="shadow-gentle">
-            <CardContent className="p-12 text-center">
-              <Music className="h-16 w-16 text-muted-foreground/50 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-muted-foreground mb-2">
-                Nenhuma música encontrada
-              </h3>
-              <p className="text-muted-foreground">
-                {searchTerm || categoryFilter !== "todas" 
-                  ? 'Tente ajustar os filtros de busca.' 
-                  : 'Adicione a primeira música ao repertório.'}
-              </p>
-            </CardContent>
-          </Card>
-        )}
+            {filteredSongs.length === 0 && (
+              <div className="p-12 text-center">
+                <Music className="h-16 w-16 text-muted-foreground/50 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-muted-foreground mb-2">
+                  Nenhuma música encontrada
+                </h3>
+                <p className="text-muted-foreground">
+                  {searchTerm || categoryFilter !== "todas" 
+                    ? 'Tente ajustar os filtros de busca.' 
+                    : 'Adicione a primeira música ao repertório.'}
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
 
       {/* Dialog para visualizar cifra */}

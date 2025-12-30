@@ -941,40 +941,45 @@ const EventoDetalhes = () => {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Voltar para Agenda
           </Button>
-          
-          <div className="bg-gradient-to-r from-primary/5 to-transparent p-6 rounded-lg border">
-            <h1 className="text-4xl font-bold text-primary mb-4">{event.title}</h1>
-            <div className="flex items-center gap-3 flex-wrap">
-              <Badge 
-                variant={event.event_type === 'evento' ? 'default' : 'secondary'}
-                className={`text-base px-3 py-1 ${
-                  event.event_type === 'evento' 
-                    ? 'bg-gradient-divine text-white' 
-                    : 'bg-muted text-muted-foreground'
-                }`}
-              >
-                {event.event_type === 'evento' ? '🎵 Evento' : '🎹 Ensaio'}
-              </Badge>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Calendar className="h-4 w-4" />
-                <span className="font-medium">{formatDate(event.event_date)}</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Clock className="h-4 w-4" />
-                <span>{event.event_time}{event.end_time && ` - ${event.end_time}`}</span>
-              </div>
-              {event.location && (
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <MapPin className="h-4 w-4" />
-                  <span>{event.location}</span>
-                </div>
-              )}
-            </div>
-          </div>
         </div>
 
-        {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        {/* Card Principal */}
+        <Card className="shadow-gentle">
+          <CardHeader>
+            <div className="space-y-4">
+              <CardTitle className="text-3xl font-bold text-primary">{event.title}</CardTitle>
+              <div className="flex items-center gap-3 flex-wrap">
+                <Badge 
+                  variant={event.event_type === 'evento' ? 'default' : 'secondary'}
+                  className={`text-base px-3 py-1 ${
+                    event.event_type === 'evento' 
+                      ? 'bg-gradient-divine text-white' 
+                      : 'bg-muted text-muted-foreground'
+                  }`}
+                >
+                  {event.event_type === 'evento' ? '🎵 Evento' : '🎹 Ensaio'}
+                </Badge>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Calendar className="h-4 w-4" />
+                  <span className="font-medium">{formatDate(event.event_date)}</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Clock className="h-4 w-4" />
+                  <span>{event.event_time}{event.end_time && ` - ${event.end_time}`}</span>
+                </div>
+                {event.location && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <MapPin className="h-4 w-4" />
+                    <span>{event.location}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </CardHeader>
+
+          <CardContent>
+            {/* Tabs */}
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-4 gap-2 mb-6">
             <TabsTrigger value="info" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               <FileText className="h-4 w-4 mr-2" />
@@ -997,7 +1002,7 @@ const EventoDetalhes = () => {
           {/* Tab: Informações */}
           <TabsContent value="info" className="space-y-4">
             {event.description && (
-              <Card>
+              <Card className="hover:shadow-gentle transition-shadow">
                 <CardHeader>
                   <CardTitle className="text-lg">Descrição</CardTitle>
                 </CardHeader>
@@ -1008,7 +1013,7 @@ const EventoDetalhes = () => {
             )}
 
             {event.notes && (
-              <Card>
+              <Card className="hover:shadow-gentle transition-shadow">
                 <CardHeader>
                   <CardTitle className="text-lg">Observações Importantes</CardTitle>
                 </CardHeader>
@@ -1019,7 +1024,7 @@ const EventoDetalhes = () => {
             )}
 
             {attachments.length > 0 && (
-              <Card>
+              <Card className="hover:shadow-gentle transition-shadow">
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-2">
                     <ExternalLink className="h-5 w-5" />
@@ -1029,17 +1034,20 @@ const EventoDetalhes = () => {
                 <CardContent>
                   <div className="space-y-2">
                     {attachments.map((attachment, index) => (
-                      <a
-                        key={index}
-                        href={attachment.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-3 p-3 rounded-lg border hover:bg-accent transition-colors group"
-                      >
-                        <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-primary" />
-                        <span className="flex-1 text-sm font-medium group-hover:text-primary">{attachment.name}</span>
-                        <span className="text-xs text-muted-foreground">Abrir ↗</span>
-                      </a>
+                      <Card key={index} className="hover:shadow-gentle transition-shadow">
+                        <CardContent className="p-3">
+                          <a
+                            href={attachment.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-3 group"
+                          >
+                            <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-primary" />
+                            <span className="flex-1 text-sm font-medium group-hover:text-primary">{attachment.name}</span>
+                            <span className="text-xs text-muted-foreground">Abrir ↗</span>
+                          </a>
+                        </CardContent>
+                      </Card>
                     ))}
                   </div>
                 </CardContent>
@@ -1050,12 +1058,10 @@ const EventoDetalhes = () => {
           {/* Tab: Repertório */}
           <TabsContent value="repertorio" className="space-y-6">
             {eventSongs.length === 0 ? (
-              <Card>
-                <CardContent className="py-12 text-center">
-                  <Music className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
-                  <p className="text-muted-foreground">Nenhuma música adicionada ao repertório</p>
-                </CardContent>
-              </Card>
+              <div className="py-12 text-center">
+                <Music className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
+                <p className="text-muted-foreground">Nenhuma música adicionada ao repertório</p>
+              </div>
             ) : (
               <>
                 {/* Botões de Download e Impressão */}
@@ -1078,7 +1084,7 @@ const EventoDetalhes = () => {
                   </Button>
                 </div>
                 {eventSongs.map((eventSong, index) => (
-                <Card key={eventSong.id} className="overflow-hidden">
+                <Card key={eventSong.id} className="overflow-hidden hover:shadow-gentle transition-shadow">
                   <CardHeader className="bg-gradient-to-r from-primary/10 to-transparent pb-4">
                     <div className="flex items-start gap-4">
                       <Badge variant="default" className="bg-primary text-primary-foreground text-xl px-4 py-2 font-bold">
@@ -1274,6 +1280,8 @@ const EventoDetalhes = () => {
             </div>
           </TabsContent>
         </Tabs>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
